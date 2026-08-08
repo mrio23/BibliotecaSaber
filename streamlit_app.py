@@ -3,6 +3,7 @@ import streamlit as st
 from main import (
     cadastrar_livro,
     listar_livros,
+    listar_alunos,
     registrar_emprestimo
 )
 
@@ -36,6 +37,7 @@ opcao = st.sidebar.selectbox(
     "Escolha uma opção:",
     [
         "Início",
+        "Alunos",
         "Livros",
         "Cadastrar livro",
         "Empréstimos"
@@ -55,7 +57,35 @@ if opcao == "Início":
         "Bem-vindo ao sistema Biblioteca Virtual Saber."
     )
 
+# ============================================================
+# LISTAR ALUNOS
+# ============================================================
 
+elif opcao == "Alunos":
+    st.header("📓 Alunos cadastrados")
+    
+    try:
+        
+        alunos = listar_alunos()
+        
+        if alunos:
+            
+            st.dataframe(
+                alunos,
+                use_container_width=True
+            )
+        
+        else:
+            
+            st.info(
+                "Nenhum aluno foi encontrado."
+            )
+            
+    except Exception as erro:
+        
+        st.error(
+            f"Erro ao procurar o aluno {erro}"
+        )
 # ============================================================
 # LISTAR LIVROS
 # ============================================================
@@ -175,7 +205,7 @@ elif opcao == "Empréstimos":
         if not nome_livro or not nome_aluno:
 
             st.warning(
-                "Informe o nome do livro e a matrícula do aluno."
+                "Informe o nome do livro e e nome do aluno."
             )
 
         else:
@@ -208,11 +238,11 @@ elif opcao == "Empréstimos":
 # ===========================================
 # RODAPÉ
 # ===========================================
-
 st.markdown(
     """
     <style>
     .footer {
+        position: fixed;
         bottom: 0;
         left: 0;
         width: 100%;
@@ -222,11 +252,13 @@ st.markdown(
         color: #ffffff;
         font-size: 14px;
         border-top: 1px solid #333;
+        z-index: 999;
     }
     </style>
-    
+
     <div class="footer">
-        @ 2026  Projeto realizado por Mário Fernando Santos Campos e Ana Beatriz Moura Carvalho. Todos os direitos reservados.
+        © 2026 Projeto realizado por Mário Fernando Santos Campos
+        e Ana Beatriz Moura Carvalho. Todos os direitos reservados.
     </div>
     """,
     unsafe_allow_html=True

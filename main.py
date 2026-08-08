@@ -50,6 +50,18 @@ def listar_livros():
 
         return resultado.fetchall()
 
+def listar_alunos():
+    with get_connection() as conexao:
+        
+        lista = conexao.execute(text(
+            """
+            SELECT *
+            FROM alunos
+            ORDER BY id  
+        """)
+    )
+
+    return lista.fetchall()
 
 # ============================================================
 # EMPRÉSTIMOS
@@ -85,7 +97,7 @@ def registrar_emprestimo(
             )
 
         # ----------------------------------------------------
-        # Procurar o aluno pela matrícula
+        # Procurar o aluno pelo nome
         # ----------------------------------------------------
 
         aluno = conexao.execute(
