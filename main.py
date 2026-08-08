@@ -1,6 +1,10 @@
+import streamlit as st
 from src.connection import get_connection
 from sqlalchemy import text
 
+
+st.title("Biblioteca Saber")
+st.write("Biblioteca virtual para faciliar o monitoramento e acesso dos livros!")
 
 try:
     
@@ -12,25 +16,27 @@ except Exception as erro:
     
 
 
-nomeLivro = "O Pequeno Príncipe"
+titulo = "O Pequeno Príncipe"
 autor = "Antoine de Saint-Exupéry"
-dataCadastro = 2026-8-4
-isbn = "978-8595081512"
+quantidade = 3
+
 # dataCadastro = 2026-8-2
 
 with get_connection() as conexao:
     
-    conexao.execute(text("""                      
+    conexao.execute(text("""
+                         INSERT INTO emprestimos (livro_id, aluno_id, data_emprestimo, data_devolucao, status)
+                         VALUES (:livro_id, :aluno_id, :data_emprestimo, :data_devolucao, :status)            
                          """),
     {
-        "nomeLivro":nomeLivro,
-        "autor": autor,
-        "isbn": isbn
+        "livro_id": 1,
+        "aluno_id": 1,
+        "data_emprestimo": "2026-08-9",
+        "data_devolucao": "2026-09-1",
+        "status": "DEVOLVIDO"
     }
     )
     
     conexao.commit()
     
     print("Livro cadastrado.")
-
-conexao.close
