@@ -1,5 +1,5 @@
 import streamlit as st
-from src.connection import get_connection
+from database.connection import get_connection
 from sqlalchemy import text
 
 
