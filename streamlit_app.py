@@ -7,16 +7,28 @@ from main import (
 )
 
 
+# ============================================================
+# CONFIGURAÇÃO
+# ============================================================
+
 st.set_page_config(
-    page_title="SaberLibrary",
+    page_title="Biblioteca Virtual Saber",
     page_icon="📚",
     layout="wide"
 )
 
 
-st.title("📚 SaberLibrary")
-st.subheader("Sistema de gerenciamento de biblioteca")
+# ============================================================
+# CABEÇALHO
+# ============================================================
 
+st.title("📚 Biblioteca Virtual Saber")
+st.subheader("Sistema de gerenciamento de biblioteca.")
+
+
+# ============================================================
+# MENU
+# ============================================================
 
 st.sidebar.title("Menu")
 
@@ -31,14 +43,22 @@ opcao = st.sidebar.selectbox(
 )
 
 
+# ============================================================
+# INÍCIO
+# ============================================================
+
 if opcao == "Início":
 
     st.header("Início")
 
     st.write(
-        "Bem-vindo ao sistema SaberLibrary."
+        "Bem-vindo ao sistema Biblioteca Virtual Saber."
     )
 
+
+# ============================================================
+# LISTAR LIVROS
+# ============================================================
 
 elif opcao == "Livros":
 
@@ -49,12 +69,17 @@ elif opcao == "Livros":
         livros = listar_livros()
 
         if livros:
+
             st.dataframe(
                 livros,
                 use_container_width=True
             )
+
         else:
-            st.info("Nenhum livro cadastrado.")
+
+            st.info(
+                "Nenhum livro cadastrado."
+            )
 
     except Exception as erro:
 
@@ -63,16 +88,35 @@ elif opcao == "Livros":
         )
 
 
+# ============================================================
+# CADASTRAR LIVRO
+# ============================================================
+
 elif opcao == "Cadastrar livro":
 
     st.header("➕ Cadastrar livro")
 
-    titulo = st.text_input("Título do livro")
-    autor = st.text_input("Autor")
-    ano_publicacao = st.text_input("Ano de Publicação")
-    quantidade = st.text_input("Quantidade")
+    titulo = st.text_input(
+        "Título do livro"
+    )
 
-    if st.button("Cadastrar"):
+    autor = st.text_input(
+        "Autor"
+    )
+
+    ano_publicacao = st.number_input(
+        "Ano de publicação",
+        min_value=0,
+        step=1
+    )
+
+    quantidade = st.number_input(
+        "Quantidade",
+        min_value=1,
+        step=1
+    )
+
+    if st.button("Cadastrar livro"):
 
         if not titulo or not autor:
 
@@ -102,60 +146,88 @@ elif opcao == "Cadastrar livro":
                 )
 
 
+# ============================================================
+# EMPRÉSTIMOS
+# ============================================================
+
 elif opcao == "Empréstimos":
 
-    st.header("📖 Empréstimos")
+    st.header("📖 Registrar empréstimo")
 
-    livro_id = st.number_input(
-        "ID do livro",
-        min_value=1,
-        step=1
+    nome_livro = st.text_input(
+        "Nome do livro"
     )
-    
-    aluno_id = st.number_input(
-        "Matrícula do aluno",
-        min_value=1,
-        step=1
+
+    nome_aluno = st.text_input(
+        "Nome do aluno"
     )
-    
-    data_empresitmo = st.date_input(
+
+    data_emprestimo = st.date_input(
         "Data do empréstimo"
     )
-    
+
     data_devolucao = st.date_input(
-        "Data de devolução"
+        "Data prevista para devolução"
     )
-    
-    status = st.selectbox(
-        "Status",
-        [
-            "EMPRESTADO",
-            "DEVOLVIDO"
-        ]
-    )
-    
+
     if st.button("Registrar empréstimo"):
-        
-        try:
-            
-            registrar_emprestimo(
-                livro_id,
-                aluno_id,
-                data_empresitmo,
-                data_devolucao,
-                status
+
+        if not nome_livro or not nome_aluno:
+
+            st.warning(
+                "Informe o nome do livro e a matrícula do aluno."
             )
-            
-            st.success(
-                "Empréstimo registrado com sucesso!"
-            )
-    
-        except Exception as erro:
-        
-            st.error(
-                f"Erro ao registrar empréstimo: {erro}"
+
+        else:
+
+            try:
+
+                registrar_emprestimo(
+                    nome_livro,
+                    nome_aluno,
+                    data_emprestimo,
+                    data_devolucao
                 )
+
+                st.success(
+                    "Empréstimo registrado com sucesso!"
+                )
+
+            except ValueError as erro:
+
+                st.warning(
+                    str(erro)
+                )
+
+            except Exception as erro:
+
+                st.error(
+                    f"Erro ao registrar empréstimo: {erro}"
+                )
+
+# ===========================================
+# RODAPÉ
+# ===========================================
+
+st.markdown(
+    """
+    <style>
+    .footer {
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        padding: 10px;
+        background-color: #0e1117;
+        color: #ffffff;
+        font-size: 14px;
+        border-top: 1px solid #333;
+    }
+    </style>
     
-    st.info(
-        "Área de gerenciamento de empréstimos."
-    )
+    <div class="footer">
+        @ 2026  Projeto realizado por Mário Fernando Santos Campos e Ana Beatriz Moura Carvalho. Todos os direitos reservados.
+    </div>
+    """,
+    unsafe_allow_html=True
+)
