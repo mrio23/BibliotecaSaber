@@ -1,33 +1,23 @@
 import streamlit as st
-from sqlalchemy import create_engine, text
 
-# Configuração da página
+from main import (
+    cadastrar_livro,
+    listar_livros,
+    registrar_emprestimo
+)
+
+
 st.set_page_config(
     page_title="SaberLibrary",
     page_icon="📚",
     layout="wide"
 )
 
+
 st.title("📚 SaberLibrary")
 st.subheader("Sistema de gerenciamento de biblioteca")
 
-# Conexão com PostgreSQL
-DATABASE_URL = "postgresql://postgres:root@localhost:5432/saberlibrary"
 
-engine = create_engine(DATABASE_URL)
-
-# Teste da conexão
-try:
-    with engine.connect() as conexao:
-        conexao.execute(text("SELECT 1"))
-
-    st.success("Banco de dados conectado com sucesso!")
-
-except Exception as erro:
-    st.error(f"Erro ao conectar ao banco de dados: {erro}")
-
-
-# Menu lateral
 st.sidebar.title("Menu")
 
 opcao = st.sidebar.selectbox(
@@ -56,17 +46,7 @@ elif opcao == "Livros":
 
     try:
 
-        with engine.connect() as conexao:
-
-            resultado = conexao.execute(
-                text("""
-                    SELECT *
-                    FROM livros
-                    ORDER BY id
-                """)
-            )
-
-            livros = resultado.fetchall()
+        livros = listar_livros()
 
         if livros:
             st.dataframe(
@@ -88,8 +68,9 @@ elif opcao == "Cadastrar livro":
     st.header("➕ Cadastrar livro")
 
     titulo = st.text_input("Título do livro")
-
     autor = st.text_input("Autor")
+    ano_publicacao = st.text_input("Ano de Publicação")
+    quantidade = st.text_input("Quantidade")
 
     if st.button("Cadastrar"):
 
@@ -103,20 +84,12 @@ elif opcao == "Cadastrar livro":
 
             try:
 
-                with engine.begin() as conexao:
-
-                    conexao.execute(
-                        text("""
-                            INSERT INTO livros
-                            (titulo, autor)
-                            VALUES
-                            (:titulo, :autor)
-                        """),
-                        {
-                            "titulo": titulo,
-                            "autor": autor
-                        }
-                    )
+                cadastrar_livro(
+                    titulo,
+                    autor,
+                    ano_publicacao,
+                    quantidade
+                )
 
                 st.success(
                     "Livro cadastrado com sucesso!"
@@ -133,6 +106,56 @@ elif opcao == "Empréstimos":
 
     st.header("📖 Empréstimos")
 
+    livro_id = st.number_input(
+        "ID do livro",
+        min_value=1,
+        step=1
+    )
+    
+    aluno_id = st.number_input(
+        "Matrícula do aluno",
+        min_value=1,
+        step=1
+    )
+    
+    data_empresitmo = st.date_input(
+        "Data do empréstimo"
+    )
+    
+    data_devolucao = st.date_input(
+        "Data de devolução"
+    )
+    
+    status = st.selectbox(
+        "Status",
+        [
+            "EMPRESTADO",
+            "DEVOLVIDO"
+        ]
+    )
+    
+    if st.button("Registrar empréstimo"):
+        
+        try:
+            
+            registrar_emprestimo(
+                livro_id,
+                aluno_id,
+                data_empresitmo,
+                data_devolucao,
+                status
+            )
+            
+            st.success(
+                "Empréstimo registrado com sucesso!"
+            )
+    
+        except Exception as erro:
+        
+            st.error(
+                f"Erro ao registrar empréstimo: {erro}"
+                )
+    
     st.info(
         "Área de gerenciamento de empréstimos."
     )
