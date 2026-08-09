@@ -164,7 +164,7 @@ def listar_emprestimos():
                     e.status
                 FROM emprestimos e
                 INNER JOIN livros l
-                    ON e.livros_id = l.id
+                    ON e.livro_id = l.id
                 INNER JOIN alunos a
                     ON e.aluno_id = a.id
                 ORDER BY e.data_emprestimo DESC
@@ -172,3 +172,29 @@ def listar_emprestimos():
         )
         
         return resultado.fetchall()
+
+ # ----------------------------------------------------
+# Registrar Devolução
+# ----------------------------------------------------
+    
+def registrar_devolucao(emprestimo_id):
+        
+    with get_connection() as conexao:
+            
+        resultado = conexao.execute(
+            text("""
+                 UPDATE emprestimos
+                 SET status = 'DEVOLVIDO'
+                 WHERE id = :emprestimo_id
+                """),
+                {
+                   "emprestimo_id": emprestimo_id
+                }
+            )
+            
+        if resultado.rowcount == 0:
+                raise ValueError(
+                    "Empréstimo não encontrado."
+                )
+                
+        conexao.commit()

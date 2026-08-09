@@ -1,10 +1,13 @@
 import streamlit as st
+from datetime import date
 
 from main import (
     cadastrar_livro,
     listar_livros,
     listar_alunos,
-    registrar_emprestimo
+    registrar_emprestimo,
+    listar_emprestimos,
+    registrar_devolucao
 )
 
 
@@ -182,7 +185,13 @@ elif opcao == "Cadastrar livro":
 
 elif opcao == "Empréstimos":
 
-    st.header("📖 Registrar empréstimo")
+    st.header("📖 Empréstimos")
+
+    # ========================================================
+    # REGISTRAR NOVO EMPRÉSTIMO
+    # ========================================================
+
+    st.subheader("➕ Registrar empréstimo")
 
     nome_livro = st.text_input(
         "Nome do livro"
@@ -205,7 +214,7 @@ elif opcao == "Empréstimos":
         if not nome_livro or not nome_aluno:
 
             st.warning(
-                "Informe o nome do livro e e nome do aluno."
+                "Informe o nome do livro e o nome do aluno."
             )
 
         else:
@@ -223,6 +232,8 @@ elif opcao == "Empréstimos":
                     "Empréstimo registrado com sucesso!"
                 )
 
+                st.rerun()
+
             except ValueError as erro:
 
                 st.warning(
@@ -234,6 +245,193 @@ elif opcao == "Empréstimos":
                 st.error(
                     f"Erro ao registrar empréstimo: {erro}"
                 )
+
+
+    st.divider()
+
+
+    # ========================================================
+    # LISTA DOS EMPRÉSTIMOS
+    # ========================================================
+
+    st.subheader("📋 Histórico de empréstimos")
+
+    try:
+
+        emprestimos = listar_emprestimos()
+
+        if emprestimos:
+
+            for emprestimo in emprestimos:
+
+                (
+                    emprestimo_id,
+                    livro,
+                    aluno,
+                    data_emprestimo,
+                    data_devolucao,
+                    status
+                ) = emprestimo
+
+
+                # ====================================================
+                # ORGANIZAÇÃO DAS COLUNAS
+                # ====================================================
+
+                col1, col2, col3, col4, col5, col6 = st.columns(
+                    [2, 2, 1.5, 1.5, 1.5, 1.8]
+                )
+
+
+                # ====================================================
+                # LIVRO
+                # ====================================================
+
+                with col1:
+
+                    st.write(
+                        f"📚 **{livro}**"
+                    )
+
+
+                # ====================================================
+                # ALUNO
+                # ====================================================
+
+                with col2:
+
+                    st.write(
+                        f"👤 {aluno}"
+                    )
+
+
+                # ====================================================
+                # DATA DO EMPRÉSTIMO
+                # ====================================================
+
+                with col3:
+
+                    st.write(
+                        f"📅 {data_emprestimo}"
+                    )
+
+
+                # ====================================================
+                # DATA DA DEVOLUÇÃO
+                # ====================================================
+
+                with col4:
+
+                    st.write(
+                        f"📆 {data_devolucao}"
+                    )
+
+
+                # ====================================================
+                # STATUS
+                # ====================================================
+
+                with col5:
+
+                    hoje = date.today()
+
+                    if status == "DEVOLVIDO":
+
+                        st.success(
+                            "🟢 DEVOLVIDO"
+                        )
+
+                    elif status == "ATIVO":
+
+                        if (
+                            data_devolucao is not None
+                            and data_devolucao < hoje
+                        ):
+
+                            st.error(
+                                "🔴 ATRASADO"
+                            )
+
+                        else:
+
+                            st.warning(
+                                "🟠 ATIVO"
+                            )
+
+                    elif status == "CANCELADO":
+
+                        st.write(
+                            "⚪ CANCELADO"
+                        )
+
+                    else:
+
+                        st.write(
+                            status
+                        )
+                # ====================================================
+                # BOTÃO DE DEVOLUÇÃO
+                # ====================================================
+
+                with col6:
+
+                    if status == "ATIVO":
+
+                        if st.button(
+                            "Registrar devolução",
+                            key=f"devolver_{emprestimo_id}"
+                        ):
+
+                            try:
+
+                                registrar_devolucao(
+                                    emprestimo_id
+                                )
+
+                                st.success(
+                                    "Livro devolvido com sucesso!"
+                                )
+
+                                st.rerun()
+
+                            except Exception as erro:
+
+                                st.error(
+                                    f"Erro ao registrar devolução: {erro}"
+                                )
+
+                    elif status == "DEVOLVIDO":
+
+                        st.write(
+                            "✓ Devolvido"
+                        )
+                        
+                    elif status == "CANCELADO":
+                        
+                        st.write(
+                            "- Cancelado"
+                        )
+                        
+                    else:
+                        
+                        st.write(
+                            status
+                        )
+
+                st.divider()
+
+        else:
+
+            st.info(
+                "Nenhum empréstimo foi registrado."
+            )
+
+    except Exception as erro:
+
+        st.error(
+            f"Erro ao consultar empréstimos: {erro}"
+        )
+
 
 # ===========================================
 # RODAPÉ
