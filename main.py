@@ -149,3 +149,26 @@ def registrar_emprestimo(
         )
 
         conexao.commit()
+        
+def listar_emprestimos():
+    with get_connection() as conexao:
+        
+        resultado = conexao.execute(
+            text("""
+                 SELECT
+                    e.id,
+                    l.titulo AS livro,
+                    a.nome AS aluno,
+                    e.data_emprestimo,
+                    e.data_devolucao,
+                    e.status
+                FROM emprestimos e
+                INNER JOIN livros l
+                    ON e.livros_id = l.id
+                INNER JOIN alunos a
+                    ON e.aluno_id = a.id
+                ORDER BY e.data_emprestimo DESC
+            """)
+        )
+        
+        return resultado.fetchall()
