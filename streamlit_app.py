@@ -84,10 +84,10 @@ elif opcao == "Alunos":
                 "Nenhum aluno foi encontrado."
             )
             
-    except Exception as erro:
+    except Exception:
         
         st.error(
-            f"Erro ao procurar o aluno {erro}"
+            "Não foi possível carregar os alunos no momento. Tente novamente mais tarde."
         )
 # ============================================================
 # LISTAR LIVROS
@@ -114,10 +114,10 @@ elif opcao == "Livros":
                 "Nenhum livro cadastrado."
             )
 
-    except Exception as erro:
+    except Exception:
 
         st.error(
-            f"Erro ao consultar os livros: {erro}"
+            "Não foi possível consultar os livros no momento. Tente novamente mais tarde."
         )
 
 
@@ -172,10 +172,10 @@ elif opcao == "Cadastrar livro":
                     "Livro cadastrado com sucesso!"
                 )
 
-            except Exception as erro:
+            except Exception:
 
                 st.error(
-                    f"Erro ao cadastrar livro: {erro}"
+                    "Não foi possível cadastrar o livro no momento. Tente novamente mais tarde."
                 )
 
 
@@ -240,10 +240,10 @@ elif opcao == "Empréstimos":
                     str(erro)
                 )
 
-            except Exception as erro:
+            except Exception:
 
                 st.error(
-                    f"Erro ao registrar empréstimo: {erro}"
+                    "Não foi possível registrar o empréstimo no momento. Tente novamente mais tarde."
                 )
 
 
@@ -394,10 +394,10 @@ elif opcao == "Empréstimos":
 
                                 st.rerun()
 
-                            except Exception as erro:
+                            except Exception:
 
                                 st.error(
-                                    f"Erro ao registrar devolução: {erro}"
+                                    "Não foi possível registrar a devolução no momento. Tente novamente mais tarde."
                                 )
 
                     elif status == "DEVOLVIDO":
