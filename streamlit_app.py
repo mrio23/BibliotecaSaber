@@ -567,19 +567,21 @@ elif opcao == "Empréstimos":
 # ===========================================
 
 elif opcao == "Auditoria":
+
     st.header("📋 Auditoria")
+
     st.write(
         "Histórico de operações."
     )
-    
+
     try:
-        
+
         auditoria = listar_auditoria()
-        
+
         if auditoria:
-            
+
             for registro in auditoria:
-                
+
                 (
                     auditoria_id,
                     acao,
@@ -588,46 +590,47 @@ elif opcao == "Auditoria":
                     dados,
                     data_hora
                 ) = registro
-                
+
                 col1, col2, col3, col4 = st.columns(
                     [2, 2, 2, 3]
                 )
-                
+
                 with col1:
-                    
+
                     st.write(
                         f"📅 {data_hora}"
                     )
-                    
+
                 with col2:
-                    
+
                     st.write(
                         f"🔹 **{acao}**"
                     )
-                    
+
                 with col3:
-                    
+
                     st.write(
                         f"📂 {entidade}"
                     )
-                    
+
                 with col4:
-                    
+
                     st.write(
                         f"📝 {dados}"
                     )
-                    
+
                 st.divider()
-                
-            else:
-                
-                st.info(
-                    "Nenhum registro de auditoria foi encontrado."
-                )
-                
-    except Exception:
+
+        else:
+
+            st.info(
+                "Nenhum registro de auditoria foi encontrado."
+            )
+
+    except Exception as erro:
+
         st.error(
-            "Não foi possível carregar os registros de auditoria."
+            f"Não foi possível carregar os registros de auditoria: {erro}"
         )
         
 # ===========================================
