@@ -1,9 +1,13 @@
 import streamlit as st
 from datetime import date
 
+
+
 from main import (
     cadastrar_livro,
     listar_livros,
+    livro_possui_emprestimos,
+    excluir_livro,
     cadastrar_aluno,
     listar_alunos,
     aluno_possui_emprestimos,
@@ -11,7 +15,11 @@ from main import (
     listar_auditoria,
     registrar_emprestimo,
     listar_emprestimos,
-    registrar_devolucao
+    registrar_devolucao,
+    contar_livros,
+    contar_alunos,
+    contar_emprestimos_ativos,
+    contar_emprestimos_atrasados
 )
 
 
@@ -27,6 +35,24 @@ st.set_page_config(
 
 
 # ============================================================
+# CARREGAR CSS
+# ============================================================
+
+def carregar_css():
+    with open("style.css", "r", encoding="utf-8") as arquivo:
+        css = arquivo.read()
+
+    st.markdown(
+        f"<style>{css}</style>",
+        unsafe_allow_html=True
+    )
+
+
+# Chama o CSS somente depois da função existir
+carregar_css()
+
+
+# ============================================================
 # CABEÇALHO
 # ============================================================
 
@@ -38,20 +64,34 @@ st.subheader("Sistema de gerenciamento de biblioteca.")
 # MENU
 # ============================================================
 
-st.sidebar.title("Menu")
-
-opcao = st.sidebar.selectbox(
-    "Escolha uma opção:",
-    [
-        "Início",
-        "Alunos",
-        "Livros",
-        "Cadastrar livro",
-        "Empréstimos",
-        "Auditoria"
-    ]
+st.sidebar.markdown(
+    "<div class='sideebar-menu-title'> Menu Principal</div><br></br>",
+    unsafe_allow_html=True
 )
 
+opcoes_menu = {
+    "Início": "🏠 Início",
+    "Alunos": "👥 Alunos",
+    "Livros": "📚 Livros",
+    "Cadastrar Livro": "➕ Cadastrar Livro",
+    "Empréstimos": "📖 Empréstimos",
+    "Auditoria": "📋 Auditoria"
+}
+
+if "pagina" not in st.session_state:
+    st.session_state.pagina = "Início"
+
+for chave, nome_exibicao in opcoes_menu.items():
+    
+    if st.sidebar.button(
+        nome_exibicao,
+        key=f"menu_{chave}",
+        use_container_width=True
+    ):
+        st.session_state.pagina = chave
+        st.rerun()
+        
+opcao = st.session_state.pagina
 
 # ============================================================
 # INÍCIO
@@ -65,115 +105,354 @@ if opcao == "Início":
         "Bem-vindo ao sistema Biblioteca Virtual Saber."
     )
 
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # ========================================================
+    # BUSCAR INDICADORES
+    # ========================================================
+
+    try:
+
+        quantidade_livros = contar_livros()
+        quantidade_alunos = contar_alunos()
+        emprestimos_ativos = contar_emprestimos_ativos()
+        emprestimos_atrasados = contar_emprestimos_atrasados()
+
+        erro_indicadores = False
+
+    except Exception:
+
+        quantidade_livros = 0
+        quantidade_alunos = 0
+        emprestimos_ativos = 0
+        emprestimos_atrasados = 0
+
+        erro_indicadores = True
+
+    # ========================================================
+    # AVISO
+    # ========================================================
+
+    if erro_indicadores:
+
+        st.warning(
+            "Não foi possível atualizar os indicadores no momento. "
+            "Tente novamente mais tarde."
+        )
+
+    # ========================================================
+    # INDICADORES
+    # ========================================================
+
+    col1, col2, col3, col4 = st.columns(4)
+
+    # ========================================================
+    # LIVROS
+    # ========================================================
+
+    with col1:
+
+        st.html(
+            f"""
+            <div class="dashboard-card">
+
+                <div class="dashboard-icon">
+                    📚
+                </div>
+
+                <div class="dashboard-title">
+                    Livros
+                </div>
+
+                <div class="dashboard-value">
+                    {quantidade_livros}
+                </div>
+
+                <div class="dashboard-description">
+                    Total cadastrados
+                </div>
+
+            </div>
+            """
+        )
+
+    # ========================================================
+    # ALUNOS
+    # ========================================================
+
+    with col2:
+
+        st.html(
+            f"""
+            <div class="dashboard-card">
+
+                <div class="dashboard-icon">
+                    👥
+                </div>
+
+                <div class="dashboard-title">
+                    Alunos
+                </div>
+
+                <div class="dashboard-value">
+                    {quantidade_alunos}
+                </div>
+
+                <div class="dashboard-description">
+                    Total cadastrados
+                </div>
+
+            </div>
+            """
+        )
+
+    # ========================================================
+    # EMPRÉSTIMOS ATIVOS
+    # ========================================================
+
+    with col3:
+
+        st.html(
+            f"""
+            <div class="dashboard-card">
+
+                <div class="dashboard-icon">
+                    📖
+                </div>
+
+                <div class="dashboard-title">
+                    Empréstimos ativos
+                </div>
+
+                <div class="dashboard-value">
+                    {emprestimos_ativos}
+                </div>
+
+                <div class="dashboard-description">
+                    Atualmente emprestados
+                </div>
+
+            </div>
+            """
+        )
+
+    # ========================================================
+    # ATRASADOS
+    # ========================================================
+
+    with col4:
+
+        st.html(
+            f"""
+            <div class="dashboard-card">
+
+                <div class="dashboard-icon">
+                    🔴
+                </div>
+
+                <div class="dashboard-title">
+                    Atrasados
+                </div>
+
+                <div class="dashboard-value">
+                    {emprestimos_atrasados}
+                </div>
+
+                <div class="dashboard-description">
+                    Precisam de atenção
+                </div>
+
+            </div>
+            """
+        )
+
 
 # ============================================================
-# LISTAR ALUNOS
+# ALUNOS
 # ============================================================
 
 elif opcao == "Alunos":
 
-    st.header("📋 Cadastrar Aluno")
-    
+    st.header("👥 Alunos")
+
+    # ========================================================
+    # CADASTRAR ALUNO
+    # ========================================================
+
+    st.subheader("➕ Cadastrar aluno")
+
     nome = st.text_input(
         "Nome do aluno"
     )
-    
+
     matricula = st.text_input(
         "Matrícula"
     )
-    
-    if st.button("Cadastrar aluno"):
+
+    if st.button(
+        "Cadastrar aluno",
+        use_container_width=True
+    ):
+
         if not nome or not matricula:
+
             st.warning(
                 "Preencha os campos Nome e matrícula."
             )
-            
+
         else:
-            
+
             try:
-                
+
                 cadastrar_aluno(
                     nome,
                     matricula
                 )
-                
-                
+
                 st.success(
                     "Aluno cadastrado com sucesso!"
                 )
-                
+
+                st.rerun()
+
             except Exception:
-                
+
                 st.error(
-                    "Não foi possível cadastar o aluno momento. Tente novamente mais tarde."
+                    "Não foi possível cadastrar o aluno no momento. "
+                    "Tente novamente mais tarde."
                 )
 
+    st.divider()
 
-
+    # ========================================================
+    # LISTAGEM
+    # ========================================================
 
     st.subheader("📓 Alunos cadastrados")
-    
+
     try:
-        
+
         alunos = listar_alunos()
-        
+
         if alunos:
+
             for aluno in alunos:
+
                 aluno_id = aluno[0]
-                nome = aluno[1]
-                matricula = aluno[2]
-                
-                col1,col2,col3 = st.columns([4, 3, 1])
-                
-                with col1:
-                    st.write(
-                        f"👤 **{nome}**"
-                    )
-                    
+                nome_aluno = aluno[1]
+                matricula_aluno = aluno[2]
+
+                # ============================================
+                # CARD
+                # ============================================
+
+                st.html(
+    f"""
+    <div class="library-card">
+
+        <div class="card-header">
+
+            <div>
+
+                <div class="card-title">
+                    👤 {nome_aluno}
+                </div>
+
+                <div class="card-subtitle">
+                    Aluno cadastrado
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="card-divider"></div>
+
+        <div class="card-info">
+
+            <div class="card-info-item">
+
+                <div class="card-info-label">
+                    Matrícula
+                </div>
+
+                <div class="card-info-value">
+                    {matricula_aluno}
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    """
+)
+
+                # ============================================
+                # BOTÃO EXCLUIR
+                # ============================================
+
+                col1, col2 = st.columns(
+                    [5, 1]
+                )
+
                 with col2:
-                    st.write(
-                        f"**{matricula}**"
-                    )
-                
-                with col3:
+
                     if st.button(
-                        "Excluir",
-                        key=f"excluir_aluno_{aluno_id}"
+                        "🗑️ Excluir",
+                        key=f"excluir_aluno_{aluno_id}",
+                        use_container_width=True
                     ):
-                        
-                        # st.write("ID do aluno:", aluno_id)
-                        
+
                         try:
-                            
+
                             if aluno_possui_emprestimos(aluno_id):
+
                                 st.warning(
-                                    f"⚠️ Não é possivel excluir o aluno **{nome}**, "
-                                    "pois ele possui um empréstimo ativo."
+                                    f"⚠️ Não é possível excluir "
+                                    f"o aluno **{nome_aluno}**, "
+                                    "pois ele possui um "
+                                    "empréstimo ativo."
                                 )
+
                             else:
-                                
+
                                 excluir_aluno(aluno_id)
-                                
+
                                 st.success(
-                                    f"Aluno **{nome}** exlucido com sucesso!"
+                                    f"Aluno **{nome_aluno}** "
+                                    "excluído com sucesso!"
                                 )
-                                
+
                                 st.rerun()
-                        except Exception as erro:
-                            st.error(str(erro))
+
+                        except Exception:
+
+                            st.error(
+                                "Não foi possível excluir o aluno "
+                                "no momento."
+                            )
+
+                st.markdown(
+                    "<div style='height: 8px'></div>",
+                    unsafe_allow_html=True
+                )
+
         else:
-            
+
             st.info(
                 "Nenhum aluno foi encontrado."
             )
-            
+
     except Exception:
-        
+
         st.error(
-            "Não foi possível carregar os alunos no momento. Tente novamente mais tarde."
+            "Não foi possível carregar os alunos no momento. "
+            "Tente novamente mais tarde."
         )
+    
 # ============================================================
-# LISTAR LIVROS
+# LIVROS
 # ============================================================
 
 elif opcao == "Livros":
@@ -187,50 +466,163 @@ elif opcao == "Livros":
         if livros:
 
             for livro in livros:
+
                 livro_id = livro[0]
                 titulo = livro[1]
                 autor = livro[2]
                 ano_publicacao = livro[3]
                 quantidade = livro[4]
-                
-                col1, col2, col3, col4, col5 = st.columns(
-                    [3, 2.5, 1.5, 1.5, 1]
-                )
-                
-                with col1:
-                    
-                    st.write(
-                        f"📚 **{titulo}**"
-                    )
-                    
-                with col2:
-                    
-                    st.write(
-                        f"✍️ {autor}"
-                    )
-                    
-                with col3:
-                    
-                    st.write(
-                        f"📅 {ano_publicacao}"
-                    )
-                    
-                with col4:
-                    
-                    st.write(
-                        f"📦 {quantidade}"
-                    )
 
-                with col5:
-                    
-                    st.button (
-                        "Excluir",
-                        key=f"excluir_livro_{livro_id}"
-                    )
-                    
-                    st.divider()
-                    
-                    
+                # ====================================================
+                # DISPONIBILIDADE
+                # ====================================================
+
+                if quantidade > 0:
+
+                    disponibilidade = "🟢 Disponível"
+
+                else:
+
+                    disponibilidade = "🔴 Indisponível"
+
+                # ====================================================
+                # CARD DO LIVRO
+                # ====================================================
+
+                st.html(
+                    f"""
+                    <div class="library-card">
+
+                        <div class="card-header">
+
+                            <div>
+
+                                <div class="card-title">
+                                    📚 {titulo}
+                                </div>
+
+                                <div class="card-subtitle">
+                                    {autor}
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="card-divider"></div>
+
+                        <div class="card-info">
+
+                            <div class="card-info-item">
+
+                                <div class="card-info-label">
+                                    Autor
+                                </div>
+
+                                <div class="card-info-value">
+                                    {autor}
+                                </div>
+
+                            </div>
+
+                            <div class="card-info-item">
+
+                                <div class="card-info-label">
+                                    Ano de publicação
+                                </div>
+
+                                <div class="card-info-value">
+                                    {ano_publicacao}
+                                </div>
+
+                            </div>
+
+                            <div class="card-info-item">
+
+                                <div class="card-info-label">
+                                    Exemplares
+                                </div>
+
+                                <div class="card-info-value">
+                                    {quantidade}
+                                </div>
+
+                            </div>
+
+                            <div class="card-info-item">
+
+                                <div class="card-info-label">
+                                    Disponibilidade
+                                </div>
+
+                                <div class="card-info-value">
+                                    {disponibilidade}
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                    """
+                )
+
+                # ====================================================
+                # BOTÃO EXCLUIR
+                # ====================================================
+
+                col1, col2 = st.columns([5, 1])
+
+                with col2:
+
+                    if st.button(
+                        "🗑️ Excluir",
+                        key=f"excluir_livro_{livro_id}",
+                        use_container_width=True
+                    ):
+
+                        try:
+
+                            if livro_possui_emprestimos(livro_id):
+
+                                st.warning(
+                                    f"⚠️ Não é possível excluir o livro "
+                                    f"**{titulo}**, pois ele possui "
+                                    f"registros de empréstimos."
+                                )
+
+                            else:
+
+                                excluir_livro(livro_id)
+
+                                st.success(
+                                    f"Livro **{titulo}** excluído com sucesso!"
+                                )
+
+                                st.rerun()
+
+                        except ValueError as erro:
+
+                            st.warning(
+                                str(erro)
+                            )
+
+                        except Exception:
+
+                            st.error(
+                                "Não foi possível excluir o livro no momento. "
+                                "Tente novamente mais tarde."
+                            )
+
+                # ====================================================
+                # ESPAÇAMENTO ENTRE OS CARDS
+                # ====================================================
+
+                st.markdown(
+                    "<div style='height: 8px'></div>",
+                    unsafe_allow_html=True
+                )
+
         else:
 
             st.info(
@@ -240,7 +632,8 @@ elif opcao == "Livros":
     except Exception:
 
         st.error(
-            "Não foi possível consultar os livros no momento. Tente novamente mais tarde."
+            "Não foi possível consultar os livros no momento. "
+            "Tente novamente mais tarde."
         )
 
 
@@ -638,22 +1031,6 @@ elif opcao == "Auditoria":
 # ===========================================
 st.markdown(
     """
-    <style>
-    .footer {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        text-align: center;
-        padding: 10px;
-        background-color: #0e1117;
-        color: #ffffff;
-        font-size: 14px;
-        border-top: 1px solid #333;
-        z-index: 999;
-    }
-    </style>
-
     <div class="footer">
         © 2026 Projeto realizado por Mário Fernando Santos Campos
         e Ana Beatriz Moura Carvalho. Todos os direitos reservados.
