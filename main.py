@@ -601,7 +601,8 @@ def registrar_emprestimo(
                 text("""
                     SELECT
                         id,
-                        titulo
+                        titulo,
+                        quantidade
                     FROM livros
                     WHERE LOWER(titulo) = LOWER(:titulo)
                 """),
@@ -617,7 +618,18 @@ def registrar_emprestimo(
                 )
 
 
-            livro_id, livro_titulo = livro
+            livro_id, livro_titulo, quantidade = livro
+
+
+            # ------------------------------------------------
+            # Verificar disponibilidade
+            # ------------------------------------------------
+
+            if quantidade <= 0:
+
+                raise ValueError(
+                    "Este livro não possui exemplares disponíveis."
+                )
 
 
             # ------------------------------------------------
@@ -683,6 +695,22 @@ def registrar_emprestimo(
 
 
             # ------------------------------------------------
+            # Diminuir quantidade disponível
+            # ------------------------------------------------
+
+            conexao.execute(
+                text("""
+                    UPDATE livros
+                    SET quantidade = quantidade - 1
+                    WHERE id = :livro_id
+                """),
+                {
+                    "livro_id": livro_id
+                }
+            )
+
+
+            # ------------------------------------------------
             # Registrar auditoria
             # ------------------------------------------------
 
@@ -704,7 +732,12 @@ def registrar_emprestimo(
             )
 
 
+            # ------------------------------------------------
+            # Confirmar
+            # ------------------------------------------------
+
             conexao.commit()
+
 
         except Exception:
 
@@ -761,7 +794,8 @@ def registrar_devolucao(emprestimo_id):
                         e.aluno_id,
                         a.nome,
                         a.matricula,
-                        e.data_emprestimo
+                        e.data_emprestimo,
+                        e.status
                     FROM emprestimos e
                     INNER JOIN livros l
                         ON e.livro_id = l.id
@@ -773,6 +807,7 @@ def registrar_devolucao(emprestimo_id):
                     "emprestimo_id": emprestimo_id
                 }
             ).fetchone()
+
 
             if emprestimo is None:
 
@@ -788,8 +823,23 @@ def registrar_devolucao(emprestimo_id):
                 aluno_id,
                 aluno_nome,
                 matricula,
-                data_emprestimo
+                data_emprestimo,
+                status_atual
             ) = emprestimo
+
+
+            # ------------------------------------------------
+            # Verificar status
+            # ------------------------------------------------
+
+            if status_atual not in (
+                "ATIVO",
+                "ATRASADO"
+            ):
+
+                raise ValueError(
+                    "Este empréstimo não está ativo."
+                )
 
 
             # ------------------------------------------------
@@ -801,17 +851,35 @@ def registrar_devolucao(emprestimo_id):
                     UPDATE emprestimos
                     SET status = 'DEVOLVIDO'
                     WHERE id = :emprestimo_id
+                    AND status IN ('ATIVO', 'ATRASADO')
                 """),
                 {
                     "emprestimo_id": emprestimo_id
                 }
             )
 
+
             if resultado.rowcount == 0:
 
                 raise ValueError(
-                    "Empréstimo não encontrado."
+                    "Empréstimo não encontrado ou já devolvido."
                 )
+
+
+            # ------------------------------------------------
+            # Devolver exemplar ao estoque
+            # ------------------------------------------------
+
+            conexao.execute(
+                text("""
+                    UPDATE livros
+                    SET quantidade = quantidade + 1
+                    WHERE id = :livro_id
+                """),
+                {
+                    "livro_id": livro_id
+                }
+            )
 
 
             # ------------------------------------------------
@@ -830,13 +898,18 @@ def registrar_devolucao(emprestimo_id):
                     "livro_id": livro_id,
                     "livro_titulo": livro_titulo,
                     "data_emprestimo": data_emprestimo,
-                    "status_anterior": "ATIVO",
+                    "status_anterior": status_atual,
                     "status_novo": "DEVOLVIDO"
                 }
             )
 
 
+            # ------------------------------------------------
+            # Confirmar
+            # ------------------------------------------------
+
             conexao.commit()
+
 
         except Exception:
 

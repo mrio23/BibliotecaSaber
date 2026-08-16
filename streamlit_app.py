@@ -72,6 +72,16 @@ st.subheader(
 # MENU
 # ============================================================
 
+st.sidebar.markdown(
+    """
+    <div class="sidebar-menu-title">
+        Menu Principal
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+
 opcoes_menu = {
     "Início": "🏠 Início",
     "Alunos": "👥 Alunos",
@@ -87,23 +97,12 @@ opcoes_menu = {
 # ============================================================
 
 if "pagina" not in st.session_state:
-
     st.session_state.pagina = "Início"
 
 
 # ============================================================
-# SIDEBAR
+# BOTÕES DO MENU
 # ============================================================
-
-st.sidebar.markdown(
-    """
-    <div class="sidebar-menu-title">
-        Menu Principal
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-
 
 for chave, nome_exibicao in opcoes_menu.items():
 
@@ -114,13 +113,8 @@ for chave, nome_exibicao in opcoes_menu.items():
     ):
 
         st.session_state.pagina = chave
-
         st.rerun()
 
-
-# ============================================================
-# PÁGINA SELECIONADA
-# ============================================================
 
 opcao = st.session_state.pagina
 
