@@ -33,6 +33,21 @@ section[data-testid="stSidebar"] * {
 
 
 /* ============================================================
+   TÍTULO DO MENU
+============================================================ */
+
+.sidebar-menu-title {
+    font-size: 18px;
+
+    font-weight: 600;
+
+    color: var(--text-color);
+
+    margin-bottom: 15px;
+}
+
+
+/* ============================================================
    CARDS
 ============================================================ */
 
@@ -200,9 +215,9 @@ section[data-testid="stSidebar"] * {
 }
 
 
-/* ------------------------------------------------------------
+/* ============================================================
    ATIVO
------------------------------------------------------------- */
+============================================================ */
 
 .status-active {
     background: rgba(245, 158, 11, 0.12);
@@ -211,9 +226,9 @@ section[data-testid="stSidebar"] * {
 }
 
 
-/* ------------------------------------------------------------
+/* ============================================================
    DEVOLVIDO
------------------------------------------------------------- */
+============================================================ */
 
 .status-returned {
     background: rgba(16, 185, 129, 0.12);
@@ -222,9 +237,9 @@ section[data-testid="stSidebar"] * {
 }
 
 
-/* ------------------------------------------------------------
+/* ============================================================
    ATRASADO
------------------------------------------------------------- */
+============================================================ */
 
 .status-late {
     background: rgba(239, 68, 68, 0.12);
@@ -233,9 +248,9 @@ section[data-testid="stSidebar"] * {
 }
 
 
-/* ------------------------------------------------------------
+/* ============================================================
    CANCELADO
------------------------------------------------------------- */
+============================================================ */
 
 .status-cancelled {
     background: rgba(128, 128, 128, 0.12);
@@ -396,18 +411,23 @@ hr {
 
 @media (max-width: 768px) {
 
+
     /* --------------------------------------------------------
        SIDEBAR
     -------------------------------------------------------- */
 
-    [data-testid="stSidebar"] {
-        background: var(--secondary-background-color) !important;
+    section[data-testid="stSidebar"] {
 
-        min-width: 260px !important;
-        max-width: 260px !important;
-        width: 260px !important;
+        background-color:
+            var(--secondary-background-color) !important;
 
-        z-index: 999999 !important;
+        width: 280px !important;
+
+        min-width: 280px !important;
+
+        max-width: 280px !important;
+
+        z-index: 1000 !important;
     }
 
 
@@ -415,17 +435,21 @@ hr {
        FUNDO INTERNO DA SIDEBAR
     -------------------------------------------------------- */
 
-    [data-testid="stSidebar"] > div:first-child {
-        background: var(--secondary-background-color) !important;
+    section[data-testid="stSidebar"] > div:first-child {
+
+        background-color:
+            var(--secondary-background-color) !important;
     }
 
 
     /* --------------------------------------------------------
-       CONTEÚDO INTERNO DA SIDEBAR
+       CONTEÚDO DA SIDEBAR
     -------------------------------------------------------- */
 
-    [data-testid="stSidebar"] section {
-        background: var(--secondary-background-color) !important;
+    section[data-testid="stSidebar"] [data-testid="stSidebarContent"] {
+
+        background-color:
+            var(--secondary-background-color) !important;
     }
 
 
@@ -433,8 +457,52 @@ hr {
        TEXTOS DA SIDEBAR
     -------------------------------------------------------- */
 
-    [data-testid="stSidebar"] * {
-        color: var(--text-color) !important;
+    section[data-testid="stSidebar"] * {
+
+        color:
+            var(--text-color) !important;
+    }
+
+
+    /* --------------------------------------------------------
+       TÍTULO DO MENU
+    -------------------------------------------------------- */
+
+    .sidebar-menu-title {
+
+        font-size: 17px !important;
+
+        margin-bottom: 12px !important;
+    }
+
+
+    /* --------------------------------------------------------
+       BOTÕES DO MENU
+    -------------------------------------------------------- */
+
+    section[data-testid="stSidebar"] .stButton > button {
+
+        width: 100% !important;
+
+        min-height: 46px !important;
+
+        font-size: 14px !important;
+
+        padding: 10px 12px !important;
+
+        border-radius: 10px !important;
+
+        margin-bottom: 5px !important;
+    }
+
+
+    /* --------------------------------------------------------
+       CONTROLE DA SIDEBAR
+    -------------------------------------------------------- */
+
+    [data-testid="stSidebarCollapsedControl"] {
+
+        z-index: 1100 !important;
     }
 
 
@@ -443,81 +511,52 @@ hr {
     -------------------------------------------------------- */
 
     [data-testid="stAppViewContainer"] {
+
         width: 100% !important;
     }
+
 
     [data-testid="stMain"] {
-        width: 100% !important;
-    }
 
-
-    /* --------------------------------------------------------
-       BOTÃO DE ABRIR/FECHAR SIDEBAR
-    -------------------------------------------------------- */
-
-    [data-testid="stSidebarCollapsedControl"] {
-        background: var(--secondary-background-color) !important;
-
-        border-radius: 0 10px 10px 0 !important;
-
-        z-index: 1000000 !important;
-    }
-
-
-    [data-testid="stSidebarCollapsedControl"] button {
-        background: var(--secondary-background-color) !important;
-
-        color: var(--text-color) !important;
-    }
-
-
-    /* --------------------------------------------------------
-       BOTÕES DO MENU
-    -------------------------------------------------------- */
-
-    [data-testid="stSidebar"] .stButton > button {
         width: 100% !important;
 
-        min-height: 44px !important;
+        max-width: 100% !important;
+    }
 
-        font-size: 14px !important;
 
-        padding: 10px 12px !important;
+    [data-testid="stMainBlockContainer"] {
+
+        width: 100% !important;
+
+        max-width: 100% !important;
+
+        padding-left: 1rem !important;
+
+        padding-right: 1rem !important;
     }
 
 
     /* --------------------------------------------------------
-       LOGO
+       TÍTULOS
     -------------------------------------------------------- */
 
-    .sidebar-logo {
-        padding-top: 5px !important;
+    h1 {
 
-        padding-bottom: 20px !important;
+        font-size: 28px !important;
+
+        line-height: 1.2 !important;
     }
 
 
-    .sidebar-logo-icon {
-        font-size: 36px !important;
+    h2 {
+
+        font-size: 23px !important;
     }
 
 
-    .sidebar-logo-title {
+    h3 {
+
         font-size: 19px !important;
-    }
-
-
-    /* --------------------------------------------------------
-       CABEÇALHO DA PÁGINA
-    -------------------------------------------------------- */
-
-    .page-title {
-        font-size: 24px !important;
-    }
-
-
-    .page-subtitle {
-        font-size: 13px !important;
     }
 
 
@@ -526,15 +565,97 @@ hr {
     -------------------------------------------------------- */
 
     .library-card {
+
+        width: 100% !important;
+
+        box-sizing: border-box !important;
+
+        padding: 16px !important;
+    }
+
+
+    .dashboard-card {
+
+        width: 100% !important;
+
+        box-sizing: border-box !important;
+
+        min-height: 160px !important;
+
+        padding: 18px !important;
+    }
+
+
+    /* --------------------------------------------------------
+       INFORMAÇÕES DOS CARDS
+    -------------------------------------------------------- */
+
+    .card-info {
+
+        flex-direction: column !important;
+
+        width: 100% !important;
+    }
+
+
+    .card-info-item {
+
         width: 100% !important;
 
         box-sizing: border-box !important;
     }
 
 
-    .dashboard-card {
-        width: 100% !important;
+    /* --------------------------------------------------------
+       BOTÕES
+    -------------------------------------------------------- */
 
-        box-sizing: border-box !important;
+    .stButton > button {
+
+        min-height: 44px !important;
+
+        border-radius: 9px !important;
+    }
+
+
+    /* --------------------------------------------------------
+       DASHBOARD
+    -------------------------------------------------------- */
+
+    .dashboard-icon {
+
+        font-size: 26px !important;
+    }
+
+
+    .dashboard-value {
+
+        font-size: 30px !important;
+    }
+
+
+    .dashboard-title {
+
+        font-size: 14px !important;
+    }
+
+
+    .dashboard-description {
+
+        font-size: 12px !important;
+    }
+
+
+    /* --------------------------------------------------------
+       RODAPÉ
+    -------------------------------------------------------- */
+
+    .footer {
+
+        font-size: 11px !important;
+
+        padding: 15px 5px !important;
+
+        margin-top: 30px !important;
     }
 }

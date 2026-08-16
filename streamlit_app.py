@@ -2,7 +2,6 @@ import streamlit as st
 from datetime import date
 
 
-
 from main import (
     cadastrar_livro,
     listar_livros,
@@ -30,7 +29,8 @@ from main import (
 st.set_page_config(
     page_title="Biblioteca Virtual Saber",
     page_icon="📚",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="auto"
 )
 
 
@@ -39,7 +39,13 @@ st.set_page_config(
 # ============================================================
 
 def carregar_css():
-    with open("style.css", "r", encoding="utf-8") as arquivo:
+
+    with open(
+        "style.css",
+        "r",
+        encoding="utf-8"
+    ) as arquivo:
+
         css = arquivo.read()
 
     st.markdown(
@@ -48,7 +54,6 @@ def carregar_css():
     )
 
 
-# Chama o CSS somente depois da função existir
 carregar_css()
 
 
@@ -57,11 +62,37 @@ carregar_css()
 # ============================================================
 
 st.title("📚 Biblioteca Virtual Saber")
-st.subheader("Sistema de gerenciamento de biblioteca.")
+
+st.subheader(
+    "Sistema de gerenciamento de biblioteca."
+)
 
 
 # ============================================================
 # MENU
+# ============================================================
+
+opcoes_menu = {
+    "Início": "🏠 Início",
+    "Alunos": "👥 Alunos",
+    "Livros": "📚 Livros",
+    "Cadastrar livro": "➕ Cadastrar livro",
+    "Empréstimos": "📖 Empréstimos",
+    "Auditoria": "📋 Auditoria"
+}
+
+
+# ============================================================
+# PÁGINA ATUAL
+# ============================================================
+
+if "pagina" not in st.session_state:
+
+    st.session_state.pagina = "Início"
+
+
+# ============================================================
+# SIDEBAR
 # ============================================================
 
 st.sidebar.markdown(
@@ -74,29 +105,6 @@ st.sidebar.markdown(
 )
 
 
-opcoes_menu = {
-    "Início": "🏠 Início",
-    "Alunos": "👥 Alunos",
-    "Livros": "📚 Livros",
-    "Cadastrar livro": "➕ Cadastrar livro",
-    "Empréstimos": "📖 Empréstimos",
-    "Auditoria": "📋 Auditoria"
-}
-
-
-# ------------------------------------------------------------
-# PÁGINA ATUAL
-# ------------------------------------------------------------
-
-if "pagina" not in st.session_state:
-
-    st.session_state.pagina = "Início"
-
-
-# ------------------------------------------------------------
-# BOTÕES DO MENU
-# ------------------------------------------------------------
-
 for chave, nome_exibicao in opcoes_menu.items():
 
     if st.sidebar.button(
@@ -107,49 +115,15 @@ for chave, nome_exibicao in opcoes_menu.items():
 
         st.session_state.pagina = chave
 
+        st.rerun()
+
+
+# ============================================================
+# PÁGINA SELECIONADA
+# ============================================================
 
 opcao = st.session_state.pagina
 
-# ============================================================
-# FECHAR SIDEBAR AUTOMATICAMENTE NO CELULAR
-# ============================================================
-
-if st.session_state.get("pagina"):
-
-    st.markdown(
-        """
-        <script>
-        (function() {
-
-            if (window.innerWidth <= 768) {
-
-                setTimeout(function() {
-
-                    const sidebar = window.parent.document.querySelector(
-                        '[data-testid="stSidebar"]'
-                    );
-
-                    if (!sidebar) {
-                        return;
-                    }
-
-                    const botaoFechar = sidebar.querySelector(
-                        'button[aria-label="Close sidebar"]'
-                    );
-
-                    if (botaoFechar) {
-                        botaoFechar.click();
-                    }
-
-                }, 150);
-
-            }
-
-        })();
-        </script>
-        """,
-        unsafe_allow_html=True
-    )
 
 # ============================================================
 # INÍCIO
@@ -163,7 +137,11 @@ if opcao == "Início":
         "Bem-vindo ao sistema Biblioteca Virtual Saber."
     )
 
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown(
+        "<br>",
+        unsafe_allow_html=True
+    )
+
 
     # ========================================================
     # BUSCAR INDICADORES
@@ -172,8 +150,11 @@ if opcao == "Início":
     try:
 
         quantidade_livros = contar_livros()
+
         quantidade_alunos = contar_alunos()
+
         emprestimos_ativos = contar_emprestimos_ativos()
+
         emprestimos_atrasados = contar_emprestimos_atrasados()
 
         erro_indicadores = False
@@ -181,11 +162,15 @@ if opcao == "Início":
     except Exception:
 
         quantidade_livros = 0
+
         quantidade_alunos = 0
+
         emprestimos_ativos = 0
+
         emprestimos_atrasados = 0
 
         erro_indicadores = True
+
 
     # ========================================================
     # AVISO
@@ -198,11 +183,13 @@ if opcao == "Início":
             "Tente novamente mais tarde."
         )
 
+
     # ========================================================
     # INDICADORES
     # ========================================================
 
     col1, col2, col3, col4 = st.columns(4)
+
 
     # ========================================================
     # LIVROS
@@ -234,6 +221,7 @@ if opcao == "Início":
             """
         )
 
+
     # ========================================================
     # ALUNOS
     # ========================================================
@@ -264,6 +252,7 @@ if opcao == "Início":
             """
         )
 
+
     # ========================================================
     # EMPRÉSTIMOS ATIVOS
     # ========================================================
@@ -293,6 +282,7 @@ if opcao == "Início":
             </div>
             """
         )
+
 
     # ========================================================
     # ATRASADOS
@@ -333,6 +323,7 @@ elif opcao == "Alunos":
 
     st.header("👥 Alunos")
 
+
     # ========================================================
     # CADASTRAR ALUNO
     # ========================================================
@@ -346,6 +337,7 @@ elif opcao == "Alunos":
     matricula = st.text_input(
         "Matrícula"
     )
+
 
     if st.button(
         "Cadastrar aluno",
@@ -380,7 +372,9 @@ elif opcao == "Alunos":
                     "Tente novamente mais tarde."
                 )
 
+
     st.divider()
+
 
     # ========================================================
     # LISTAGEM
@@ -397,54 +391,58 @@ elif opcao == "Alunos":
             for aluno in alunos:
 
                 aluno_id = aluno[0]
+
                 nome_aluno = aluno[1]
+
                 matricula_aluno = aluno[2]
+
 
                 # ============================================
                 # CARD
                 # ============================================
 
                 st.html(
-    f"""
-    <div class="library-card">
+                    f"""
+                    <div class="library-card">
 
-        <div class="card-header">
+                        <div class="card-header">
 
-            <div>
+                            <div>
 
-                <div class="card-title">
-                    👤 {nome_aluno}
-                </div>
+                                <div class="card-title">
+                                    👤 {nome_aluno}
+                                </div>
 
-                <div class="card-subtitle">
-                    Aluno cadastrado
-                </div>
+                                <div class="card-subtitle">
+                                    Aluno cadastrado
+                                </div>
 
-            </div>
+                            </div>
 
-        </div>
+                        </div>
 
-        <div class="card-divider"></div>
+                        <div class="card-divider"></div>
 
-        <div class="card-info">
+                        <div class="card-info">
 
-            <div class="card-info-item">
+                            <div class="card-info-item">
 
-                <div class="card-info-label">
-                    Matrícula
-                </div>
+                                <div class="card-info-label">
+                                    Matrícula
+                                </div>
 
-                <div class="card-info-value">
-                    {matricula_aluno}
-                </div>
+                                <div class="card-info-value">
+                                    {matricula_aluno}
+                                </div>
 
-            </div>
+                            </div>
 
-        </div>
+                        </div>
 
-    </div>
-    """
-)
+                    </div>
+                    """
+                )
+
 
                 # ============================================
                 # BOTÃO EXCLUIR
@@ -464,7 +462,9 @@ elif opcao == "Alunos":
 
                         try:
 
-                            if aluno_possui_emprestimos(aluno_id):
+                            if aluno_possui_emprestimos(
+                                aluno_id
+                            ):
 
                                 st.warning(
                                     f"⚠️ Não é possível excluir "
@@ -475,7 +475,9 @@ elif opcao == "Alunos":
 
                             else:
 
-                                excluir_aluno(aluno_id)
+                                excluir_aluno(
+                                    aluno_id
+                                )
 
                                 st.success(
                                     f"Aluno **{nome_aluno}** "
@@ -490,6 +492,7 @@ elif opcao == "Alunos":
                                 "Não foi possível excluir o aluno "
                                 "no momento."
                             )
+
 
                 st.markdown(
                     "<div style='height: 8px'></div>",
@@ -508,7 +511,8 @@ elif opcao == "Alunos":
             "Não foi possível carregar os alunos no momento. "
             "Tente novamente mais tarde."
         )
-    
+
+
 # ============================================================
 # LIVROS
 # ============================================================
@@ -526,10 +530,15 @@ elif opcao == "Livros":
             for livro in livros:
 
                 livro_id = livro[0]
+
                 titulo = livro[1]
+
                 autor = livro[2]
+
                 ano_publicacao = livro[3]
+
                 quantidade = livro[4]
+
 
                 # ====================================================
                 # DISPONIBILIDADE
@@ -542,6 +551,7 @@ elif opcao == "Livros":
                 else:
 
                     disponibilidade = "🔴 Indisponível"
+
 
                 # ====================================================
                 # CARD DO LIVRO
@@ -625,11 +635,14 @@ elif opcao == "Livros":
                     """
                 )
 
+
                 # ====================================================
                 # BOTÃO EXCLUIR
                 # ====================================================
 
-                col1, col2 = st.columns([5, 1])
+                col1, col2 = st.columns(
+                    [5, 1]
+                )
 
                 with col2:
 
@@ -641,7 +654,9 @@ elif opcao == "Livros":
 
                         try:
 
-                            if livro_possui_emprestimos(livro_id):
+                            if livro_possui_emprestimos(
+                                livro_id
+                            ):
 
                                 st.warning(
                                     f"⚠️ Não é possível excluir o livro "
@@ -651,7 +666,9 @@ elif opcao == "Livros":
 
                             else:
 
-                                excluir_livro(livro_id)
+                                excluir_livro(
+                                    livro_id
+                                )
 
                                 st.success(
                                     f"Livro **{titulo}** excluído com sucesso!"
@@ -672,8 +689,9 @@ elif opcao == "Livros":
                                 "Tente novamente mais tarde."
                             )
 
+
                 # ====================================================
-                # ESPAÇAMENTO ENTRE OS CARDS
+                # ESPAÇAMENTO
                 # ====================================================
 
                 st.markdown(
@@ -703,13 +721,16 @@ elif opcao == "Cadastrar livro":
 
     st.header("➕ Cadastrar livro")
 
+
     titulo = st.text_input(
         "Título do livro"
     )
 
+
     autor = st.text_input(
         "Autor"
     )
+
 
     ano_publicacao = st.number_input(
         "Ano de publicação",
@@ -717,13 +738,17 @@ elif opcao == "Cadastrar livro":
         step=1
     )
 
+
     quantidade = st.number_input(
         "Quantidade",
         min_value=1,
         step=1
     )
 
-    if st.button("Cadastrar livro"):
+
+    if st.button(
+        "Cadastrar livro"
+    ):
 
         if not titulo or not autor:
 
@@ -749,7 +774,8 @@ elif opcao == "Cadastrar livro":
             except Exception:
 
                 st.error(
-                    "Não foi possível cadastrar o livro no momento. Tente novamente mais tarde."
+                    "Não foi possível cadastrar o livro no momento. "
+                    "Tente novamente mais tarde."
                 )
 
 
@@ -761,29 +787,37 @@ elif opcao == "Empréstimos":
 
     st.header("📖 Empréstimos")
 
+
     # ========================================================
     # REGISTRAR NOVO EMPRÉSTIMO
     # ========================================================
 
     st.subheader("➕ Registrar empréstimo")
 
+
     nome_livro = st.text_input(
         "Nome do livro"
     )
+
 
     nome_aluno = st.text_input(
         "Nome do aluno"
     )
 
+
     data_emprestimo = st.date_input(
         "Data do empréstimo"
     )
+
 
     data_devolucao = st.date_input(
         "Data prevista para devolução"
     )
 
-    if st.button("Registrar empréstimo"):
+
+    if st.button(
+        "Registrar empréstimo"
+    ):
 
         if not nome_livro or not nome_aluno:
 
@@ -817,7 +851,8 @@ elif opcao == "Empréstimos":
             except Exception:
 
                 st.error(
-                    "Não foi possível registrar o empréstimo no momento. Tente novamente mais tarde."
+                    "Não foi possível registrar o empréstimo no momento. "
+                    "Tente novamente mais tarde."
                 )
 
 
@@ -829,6 +864,7 @@ elif opcao == "Empréstimos":
     # ========================================================
 
     st.subheader("📋 Histórico de empréstimos")
+
 
     try:
 
@@ -909,6 +945,7 @@ elif opcao == "Empréstimos":
 
                     hoje = date.today()
 
+
                     if status == "DEVOLVIDO":
 
                         st.success(
@@ -917,11 +954,12 @@ elif opcao == "Empréstimos":
 
 
                     elif status == "ATRASADO":
-                        
+
                         st.error(
                             "🔴 ATRASADO"
                         )
-                    
+
+
                     elif status == "ATIVO":
 
                         if (
@@ -939,24 +977,31 @@ elif opcao == "Empréstimos":
                                 "🟠 ATIVO"
                             )
 
+
                     elif status == "CANCELADO":
 
                         st.write(
                             "⚪ CANCELADO"
                         )
 
+
                     else:
 
                         st.write(
                             status
                         )
+
+
                 # ====================================================
                 # BOTÃO DE DEVOLUÇÃO
                 # ====================================================
 
                 with col6:
 
-                    if status in ("ATIVO", "ATRASADO"):
+                    if status in (
+                        "ATIVO",
+                        "ATRASADO"
+                    ):
 
                         if st.button(
                             "Registrar devolução",
@@ -978,28 +1023,34 @@ elif opcao == "Empréstimos":
                             except Exception:
 
                                 st.error(
-                                    "Não foi possível registrar a devolução no momento. Tente novamente mais tarde."
+                                    "Não foi possível registrar a devolução "
+                                    "no momento. Tente novamente mais tarde."
                                 )
+
 
                     elif status == "DEVOLVIDO":
 
                         st.write(
                             "✓ Devolvido"
                         )
-                        
+
+
                     elif status == "CANCELADO":
-                        
+
                         st.write(
                             "- Cancelado"
                         )
-                        
+
+
                     else:
-                        
+
                         st.write(
                             status
                         )
 
+
                 st.divider()
+
 
         else:
 
@@ -1007,27 +1058,32 @@ elif opcao == "Empréstimos":
                 "Nenhum empréstimo foi registrado."
             )
 
+
     except Exception as erro:
 
         st.error(
             f"Erro ao consultar empréstimos: {erro}"
         )
 
-# ===========================================
+
+# ============================================================
 # AUDITORIA
-# ===========================================
+# ============================================================
 
 elif opcao == "Auditoria":
 
     st.header("📋 Auditoria")
 
+
     st.write(
         "Histórico de operações."
     )
 
+
     try:
 
         auditoria = listar_auditoria()
+
 
         if auditoria:
 
@@ -1042,9 +1098,11 @@ elif opcao == "Auditoria":
                     data_hora
                 ) = registro
 
+
                 col1, col2, col3, col4 = st.columns(
                     [2, 2, 2, 3]
                 )
+
 
                 with col1:
 
@@ -1052,11 +1110,13 @@ elif opcao == "Auditoria":
                         f"📅 {data_hora}"
                     )
 
+
                 with col2:
 
                     st.write(
                         f"🔹 **{acao}**"
                     )
+
 
                 with col3:
 
@@ -1064,13 +1124,16 @@ elif opcao == "Auditoria":
                         f"📂 {entidade}"
                     )
 
+
                 with col4:
 
                     st.write(
                         f"📝 {dados}"
                     )
 
+
                 st.divider()
+
 
         else:
 
@@ -1078,15 +1141,18 @@ elif opcao == "Auditoria":
                 "Nenhum registro de auditoria foi encontrado."
             )
 
+
     except Exception as erro:
 
         st.error(
             f"Não foi possível carregar os registros de auditoria: {erro}"
         )
-        
-# ===========================================
+
+
+# ============================================================
 # RODAPÉ
-# ===========================================
+# ============================================================
+
 st.markdown(
     """
     <div class="footer">
