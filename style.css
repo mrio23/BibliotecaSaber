@@ -655,3 +655,109 @@ hr {
 
         margin-top: 8px;
     }
+
+/* ============================================================
+   RESPONSIVIDADE - CELULAR
+   ============================================================ */
+
+@media (max-width: 768px) {
+
+    /* --------------------------------------------------------
+       SIDEBAR
+       -------------------------------------------------------- */
+
+    [data-testid="stSidebar"] {
+        background: #f8fafc !important;
+        min-width: 260px !important;
+        max-width: 260px !important;
+        width: 260px !important;
+        z-index: 999999 !important;
+    }
+
+    /* Fundo atrás da sidebar */
+    [data-testid="stSidebar"] > div:first-child {
+        background: #f8fafc !important;
+    }
+
+
+    /* --------------------------------------------------------
+       CONTEÚDO PRINCIPAL
+       -------------------------------------------------------- */
+
+    [data-testid="stAppViewContainer"] {
+        width: 100% !important;
+    }
+
+    [data-testid="stMain"] {
+        width: 100% !important;
+    }
+
+
+    /* --------------------------------------------------------
+       HEADER / BOTÃO DA SIDEBAR
+       -------------------------------------------------------- */
+
+    [data-testid="stSidebarCollapsedControl"] {
+        background: #f8fafc !important;
+        border-radius: 0 10px 10px 0 !important;
+        z-index: 1000000 !important;
+    }
+
+
+    /* --------------------------------------------------------
+       BOTÕES DO MENU
+       -------------------------------------------------------- */
+
+    [data-testid="stSidebar"] .stButton > button {
+        width: 100% !important;
+        min-height: 44px !important;
+        font-size: 14px !important;
+        padding: 10px 12px !important;
+    }
+
+
+    /* --------------------------------------------------------
+       LOGO
+       -------------------------------------------------------- */
+
+    .sidebar-logo {
+        padding-top: 5px !important;
+        padding-bottom: 20px !important;
+    }
+
+    .sidebar-logo-icon {
+        font-size: 36px !important;
+    }
+
+    .sidebar-logo-title {
+        font-size: 19px !important;
+    }
+
+
+    /* --------------------------------------------------------
+       CABEÇALHO DA PÁGINA
+       -------------------------------------------------------- */
+
+    .page-title {
+        font-size: 24px !important;
+    }
+
+    .page-subtitle {
+        font-size: 13px !important;
+    }
+
+
+    /* --------------------------------------------------------
+       CARDS
+       -------------------------------------------------------- */
+
+    .library-card {
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    .dashboard-card {
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+}
