@@ -65,33 +65,91 @@ st.subheader("Sistema de gerenciamento de biblioteca.")
 # ============================================================
 
 st.sidebar.markdown(
-    "<div class='sideebar-menu-title'> Menu Principal</div><br></br>",
+    """
+    <div class="sidebar-menu-title">
+        Menu Principal
+    </div>
+    """,
     unsafe_allow_html=True
 )
+
 
 opcoes_menu = {
     "Início": "🏠 Início",
     "Alunos": "👥 Alunos",
     "Livros": "📚 Livros",
-    "Cadastrar Livro": "➕ Cadastrar Livro",
+    "Cadastrar livro": "➕ Cadastrar livro",
     "Empréstimos": "📖 Empréstimos",
     "Auditoria": "📋 Auditoria"
 }
 
+
+# ------------------------------------------------------------
+# PÁGINA ATUAL
+# ------------------------------------------------------------
+
 if "pagina" not in st.session_state:
+
     st.session_state.pagina = "Início"
 
+
+# ------------------------------------------------------------
+# BOTÕES DO MENU
+# ------------------------------------------------------------
+
 for chave, nome_exibicao in opcoes_menu.items():
-    
+
     if st.sidebar.button(
         nome_exibicao,
         key=f"menu_{chave}",
         use_container_width=True
     ):
+
         st.session_state.pagina = chave
-        st.rerun()
-        
+
+
 opcao = st.session_state.pagina
+
+# ============================================================
+# FECHAR SIDEBAR AUTOMATICAMENTE NO CELULAR
+# ============================================================
+
+if st.session_state.get("pagina"):
+
+    st.markdown(
+        """
+        <script>
+        (function() {
+
+            if (window.innerWidth <= 768) {
+
+                setTimeout(function() {
+
+                    const sidebar = window.parent.document.querySelector(
+                        '[data-testid="stSidebar"]'
+                    );
+
+                    if (!sidebar) {
+                        return;
+                    }
+
+                    const botaoFechar = sidebar.querySelector(
+                        'button[aria-label="Close sidebar"]'
+                    );
+
+                    if (botaoFechar) {
+                        botaoFechar.click();
+                    }
+
+                }, 150);
+
+            }
+
+        })();
+        </script>
+        """,
+        unsafe_allow_html=True
+    )
 
 # ============================================================
 # INÍCIO

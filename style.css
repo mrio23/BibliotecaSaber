@@ -37,226 +37,37 @@ section[data-testid="stSidebar"] * {
 ============================================================ */
 
 .library-card {
-    background-color: var(--secondary-background-color);
+    background: var(--secondary-background-color);
 
     border: 1px solid rgba(128, 128, 128, 0.20);
 
     border-radius: 16px;
 
-    padding: 20px 22px;
-
-    margin: 12px 0;
-
-    transition: 0.15s ease;
-}
-
-
-/* Efeito ao passar o mouse */
-
-.library-card:hover {
-    transform: translateY(-2px);
-
-    box-shadow:
-        0 8px 24px rgba(0, 0, 0, 0.08);
-
-    border-color: rgba(37, 99, 235, 0.35);
-}
-
-
-/* ============================================================
-   TÍTULO DO CARD
-============================================================ */
-
-.card-title {
-    font-size: 18px;
-
-    font-weight: 700;
-
-    color: var(--text-color);
-
-    margin-bottom: 5px;
-}
-
-
-/* ============================================================
-   SUBTÍTULO
-============================================================ */
-
-.card-subtitle {
-    font-size: 14px;
-
-    color: var(--text-color);
-
-    opacity: 0.65;
-
-    margin-bottom: 18px;
-}
-
-
-/* ============================================================
-   INFORMAÇÕES DO CARD
-============================================================ */
-
-.card-info {
-    display: flex;
-
-    gap: 12px;
-
-    flex-wrap: wrap;
-
-    margin-top: 10px;
-}
-
-
-.card-info-item {
-    background-color: rgba(128, 128, 128, 0.08);
-
-    border-radius: 10px;
-
-    padding: 9px 13px;
-
-    min-width: 110px;
-}
-
-
-.card-info-label {
-    font-size: 11px;
-
-    opacity: 0.60;
-
-    margin-bottom: 2px;
-}
-
-
-.card-info-value {
-    font-size: 14px;
-
-    font-weight: 600;
-
-    color: var(--text-color);
-}
-
-
-/* ============================================================
-   STATUS
-============================================================ */
-
-.status {
-    display: inline-flex;
-
-    align-items: center;
-
-    gap: 6px;
-
-    padding: 6px 11px;
-
-    border-radius: 999px;
-
-    font-size: 12px;
-
-    font-weight: 600;
-}
-
-
-.status-active {
-    background-color: rgba(245, 158, 11, 0.12);
-
-    color: #d97706;
-}
-
-
-.status-returned {
-    background-color: rgba(16, 185, 129, 0.12);
-
-    color: #059669;
-}
-
-
-.status-late {
-    background-color: rgba(239, 68, 68, 0.12);
-
-    color: #dc2626;
-}
-
-
-.status-cancelled {
-    background-color: rgba(128, 128, 128, 0.12);
-
-    color: #6b7280;
-}
-
-
-/* ============================================================
-   BOTÕES
-============================================================ */
-
-.stButton > button {
-    border-radius: 8px;
-
-    font-weight: 500;
-}
-
-
-/* ============================================================
-   DIVISORES
-============================================================ */
-
-hr {
-    opacity: 0.2;
-}
-
-
-/* ============================================================
-   RODAPÉ
-============================================================ */
-
-.footer {
-    text-align: center;
-    color: var(--text-color);
-    opacity: 0.7;
-    font-size: 13px;
     padding: 20px;
-    margin-top: 40px;
-}
-
-/* ============================================================
-   CARDS DO SISTEMA
-============================================================ */
-
-.library-card {
-    background: var(--secondary-background-color);
-
-    border: 1px solid rgba(128, 128, 128, 0.18);
-
-    border-radius: 14px;
-
-    padding: 18px 20px;
 
     margin: 10px 0;
 
     box-shadow:
-        0 2px 6px rgba(0, 0, 0, 0.04),
-        0 8px 20px rgba(0, 0, 0, 0.04);
+        0 4px 12px rgba(0, 0, 0, 0.05);
 
     transition:
-        transform 0.18s ease,
-        box-shadow 0.18s ease,
-        border-color 0.18s ease;
+        transform 0.15s ease,
+        box-shadow 0.15s ease,
+        border-color 0.15s ease;
 }
 
 
 /* ============================================================
-   EFEITO AO PASSAR O MOUSE
+   EFEITO DOS CARDS
 ============================================================ */
 
 .library-card:hover {
     transform: translateY(-2px);
 
-    border-color: rgba(37, 99, 235, 0.30);
-
     box-shadow:
-        0 4px 10px rgba(0, 0, 0, 0.06),
-        0 12px 28px rgba(0, 0, 0, 0.08);
+        0 8px 24px rgba(0, 0, 0, 0.10);
+
+    border-color: rgba(37, 99, 235, 0.35);
 }
 
 
@@ -278,22 +89,22 @@ hr {
 
 
 /* ============================================================
-   TÍTULO
+   TÍTULO DO CARD
 ============================================================ */
 
 .card-title {
-    font-size: 17px;
+    font-size: 18px;
 
     font-weight: 700;
 
     color: var(--text-color);
 
-    margin: 0;
+    margin-bottom: 4px;
 }
 
 
 /* ============================================================
-   SUBTÍTULO
+   SUBTÍTULO DO CARD
 ============================================================ */
 
 .card-subtitle {
@@ -316,14 +127,14 @@ hr {
 
     width: 100%;
 
-    background: rgba(128, 128, 128, 0.18);
+    background: rgba(128, 128, 128, 0.20);
 
-    margin: 14px 0;
+    margin: 16px 0;
 }
 
 
 /* ============================================================
-   INFORMAÇÕES
+   INFORMAÇÕES DO CARD
 ============================================================ */
 
 .card-info {
@@ -332,19 +143,17 @@ hr {
     gap: 10px;
 
     flex-wrap: wrap;
-
-    margin-top: 10px;
 }
 
 
 .card-info-item {
-    background: rgba(128, 128, 128, 0.07);
+    background: rgba(128, 128, 128, 0.08);
 
     border: 1px solid rgba(128, 128, 128, 0.10);
 
     border-radius: 10px;
 
-    padding: 8px 12px;
+    padding: 9px 13px;
 
     min-width: 110px;
 }
@@ -355,7 +164,7 @@ hr {
 
     color: var(--text-color);
 
-    opacity: 0.55;
+    opacity: 0.60;
 
     margin-bottom: 3px;
 }
@@ -391,7 +200,9 @@ hr {
 }
 
 
-/* ATIVO */
+/* ------------------------------------------------------------
+   ATIVO
+------------------------------------------------------------ */
 
 .status-active {
     background: rgba(245, 158, 11, 0.12);
@@ -400,7 +211,9 @@ hr {
 }
 
 
-/* DEVOLVIDO */
+/* ------------------------------------------------------------
+   DEVOLVIDO
+------------------------------------------------------------ */
 
 .status-returned {
     background: rgba(16, 185, 129, 0.12);
@@ -409,7 +222,9 @@ hr {
 }
 
 
-/* ATRASADO */
+/* ------------------------------------------------------------
+   ATRASADO
+------------------------------------------------------------ */
 
 .status-late {
     background: rgba(239, 68, 68, 0.12);
@@ -418,7 +233,9 @@ hr {
 }
 
 
-/* CANCELADO */
+/* ------------------------------------------------------------
+   CANCELADO
+------------------------------------------------------------ */
 
 .status-cancelled {
     background: rgba(128, 128, 128, 0.12);
@@ -426,263 +243,204 @@ hr {
     color: #6b7280;
 }
 
+
+/* ============================================================
+   BOTÕES
+============================================================ */
+
+.stButton > button {
+    border-radius: 8px;
+
+    font-weight: 500;
+}
+
+
+/* ============================================================
+   BOTÃO DO CARD
+============================================================ */
+
+.card-button {
+    margin-top: 8px;
+}
+
+
+/* ============================================================
+   DIVISORES
+============================================================ */
+
+hr {
+    opacity: 0.2;
+}
+
+
 /* ============================================================
    DASHBOARD - CARDS DE INDICADORES
 ============================================================ */
-    .dashboard-card {
-        box-sizing: border-box;
 
-        width: 100%;
+.dashboard-card {
+    box-sizing: border-box;
 
-        padding: 22px;
+    width: 100%;
 
-        border-radius: 16px;
+    padding: 22px;
 
-        border: 1px solid rgba(128, 128, 128, 0.20);
+    border-radius: 16px;
 
-        background: var(--secondary-background-color);
+    border: 1px solid rgba(128, 128, 128, 0.20);
 
-        box-shadow:
-            0 2px 6px rgba(0, 0, 0, 0.05),
-            0 8px 20px rgba(0, 0, 0, 0.04);
+    background: var(--secondary-background-color);
 
-        min-height: 180px;
+    box-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.05),
+        0 8px 20px rgba(0, 0, 0, 0.04);
 
-        transition:
-            transform 0.2s ease,
-            box-shadow 0.2s ease,
-            border-color 0.2s ease;
-    }
+    min-height: 180px;
 
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
 
-    .dashboard-card:hover {
 
-        transform: translateY(-3px);
+.dashboard-card:hover {
+    transform: translateY(-3px);
 
-        box-shadow:
-            0 8px 24px rgba(0, 0, 0, 0.10);
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.10);
 
-        border-color: rgba(37, 99, 235, 0.30);
-    }
+    border-color: rgba(37, 99, 235, 0.30);
+}
 
 
-    .dashboard-icon {
+/* ============================================================
+   ÍCONE DO DASHBOARD
+============================================================ */
 
-        font-size: 28px;
+.dashboard-icon {
+    font-size: 28px;
 
-        margin-bottom: 10px;
-    }
+    margin-bottom: 10px;
+}
 
 
-    .dashboard-title {
+/* ============================================================
+   TÍTULO DO DASHBOARD
+============================================================ */
 
-        font-size: 14px;
+.dashboard-title {
+    font-size: 14px;
 
-        font-weight: 600;
+    font-weight: 600;
 
-        color: var(--text-color);
+    color: var(--text-color);
 
-        opacity: 0.75;
+    opacity: 0.75;
 
-        margin-bottom: 4px;
-    }
+    margin-bottom: 4px;
+}
 
 
-    .dashboard-value {
+/* ============================================================
+   VALOR DO DASHBOARD
+============================================================ */
 
-        font-size: 32px;
+.dashboard-value {
+    font-size: 32px;
 
-        font-weight: 700;
+    font-weight: 700;
 
-        color: var(--text-color);
+    color: var(--text-color);
 
-        line-height: 1.2;
+    line-height: 1.2;
 
-        margin-bottom: 8px;
-    }
+    margin-bottom: 8px;
+}
 
 
-    .dashboard-description {
+/* ============================================================
+   DESCRIÇÃO DO DASHBOARD
+============================================================ */
 
-        font-size: 13px;
+.dashboard-description {
+    font-size: 13px;
 
-        color: var(--text-color);
+    color: var(--text-color);
 
-        opacity: 0.55;
-    }
+    opacity: 0.55;
+}
 
 
-/* =====================================================
-       CARD PRINCIPAL
-    ===================================================== */
+/* ============================================================
+   RODAPÉ
+============================================================ */
 
-    .library-card {
+.footer {
+    text-align: center;
 
-        background: var(--secondary-background-color);
+    color: var(--text-color);
 
-        border: 1px solid rgba(128, 128, 128, 0.20);
+    opacity: 0.7;
 
-        border-radius: 16px;
+    font-size: 13px;
 
-        padding: 20px;
+    padding: 20px;
 
-        margin: 10px 0;
+    margin-top: 40px;
+}
 
-        box-shadow:
-            0 4px 12px rgba(0, 0, 0, 0.05);
-
-        transition:
-            transform 0.15s ease,
-            box-shadow 0.15s ease,
-            border-color 0.15s ease;
-    }
-
-
-    .library-card:hover {
-
-        transform: translateY(-2px);
-
-        box-shadow:
-            0 8px 24px rgba(0, 0, 0, 0.10);
-
-        border-color: rgba(37, 99, 235, 0.35);
-    }
-
-
-    /* =====================================================
-       CABEÇALHO
-    ===================================================== */
-
-    .card-header {
-
-        display: flex;
-
-        align-items: center;
-
-        justify-content: space-between;
-    }
-
-
-    .card-title {
-
-        font-size: 18px;
-
-        font-weight: 700;
-
-        color: var(--text-color);
-
-        margin-bottom: 4px;
-    }
-
-
-    .card-subtitle {
-
-        font-size: 13px;
-
-        color: var(--text-color);
-
-        opacity: 0.60;
-    }
-
-
-    /* =====================================================
-       DIVISÓRIA
-    ===================================================== */
-
-    .card-divider {
-
-        height: 1px;
-
-        background: rgba(128, 128, 128, 0.20);
-
-        margin: 16px 0;
-    }
-
-
-    /* =====================================================
-       INFORMAÇÕES
-    ===================================================== */
-
-    .card-info {
-
-        display: flex;
-
-        gap: 10px;
-
-        flex-wrap: wrap;
-    }
-
-
-    .card-info-item {
-
-        background: rgba(128, 128, 128, 0.08);
-
-        border-radius: 10px;
-
-        padding: 9px 13px;
-
-        min-width: 110px;
-    }
-
-
-    .card-info-label {
-
-        font-size: 11px;
-
-        color: var(--text-color);
-
-        opacity: 0.60;
-
-        margin-bottom: 3px;
-    }
-
-
-    .card-info-value {
-
-        font-size: 14px;
-
-        font-weight: 600;
-
-        color: var(--text-color);
-    }
-
-
-    /* =====================================================
-       BOTÃO DO CARD
-    ===================================================== */
-
-    .card-button {
-
-        margin-top: 8px;
-    }
 
 /* ============================================================
    RESPONSIVIDADE - CELULAR
-   ============================================================ */
+============================================================ */
 
 @media (max-width: 768px) {
 
     /* --------------------------------------------------------
        SIDEBAR
-       -------------------------------------------------------- */
+    -------------------------------------------------------- */
 
     [data-testid="stSidebar"] {
-        background: #f8fafc !important;
+        background: var(--secondary-background-color) !important;
+
         min-width: 260px !important;
         max-width: 260px !important;
         width: 260px !important;
+
         z-index: 999999 !important;
     }
 
-    /* Fundo atrás da sidebar */
+
+    /* --------------------------------------------------------
+       FUNDO INTERNO DA SIDEBAR
+    -------------------------------------------------------- */
+
     [data-testid="stSidebar"] > div:first-child {
-        background: #f8fafc !important;
+        background: var(--secondary-background-color) !important;
+    }
+
+
+    /* --------------------------------------------------------
+       CONTEÚDO INTERNO DA SIDEBAR
+    -------------------------------------------------------- */
+
+    [data-testid="stSidebar"] section {
+        background: var(--secondary-background-color) !important;
+    }
+
+
+    /* --------------------------------------------------------
+       TEXTOS DA SIDEBAR
+    -------------------------------------------------------- */
+
+    [data-testid="stSidebar"] * {
+        color: var(--text-color) !important;
     }
 
 
     /* --------------------------------------------------------
        CONTEÚDO PRINCIPAL
-       -------------------------------------------------------- */
+    -------------------------------------------------------- */
 
     [data-testid="stAppViewContainer"] {
         width: 100% !important;
@@ -694,40 +452,55 @@ hr {
 
 
     /* --------------------------------------------------------
-       HEADER / BOTÃO DA SIDEBAR
-       -------------------------------------------------------- */
+       BOTÃO DE ABRIR/FECHAR SIDEBAR
+    -------------------------------------------------------- */
 
     [data-testid="stSidebarCollapsedControl"] {
-        background: #f8fafc !important;
+        background: var(--secondary-background-color) !important;
+
         border-radius: 0 10px 10px 0 !important;
+
         z-index: 1000000 !important;
+    }
+
+
+    [data-testid="stSidebarCollapsedControl"] button {
+        background: var(--secondary-background-color) !important;
+
+        color: var(--text-color) !important;
     }
 
 
     /* --------------------------------------------------------
        BOTÕES DO MENU
-       -------------------------------------------------------- */
+    -------------------------------------------------------- */
 
     [data-testid="stSidebar"] .stButton > button {
         width: 100% !important;
+
         min-height: 44px !important;
+
         font-size: 14px !important;
+
         padding: 10px 12px !important;
     }
 
 
     /* --------------------------------------------------------
        LOGO
-       -------------------------------------------------------- */
+    -------------------------------------------------------- */
 
     .sidebar-logo {
         padding-top: 5px !important;
+
         padding-bottom: 20px !important;
     }
+
 
     .sidebar-logo-icon {
         font-size: 36px !important;
     }
+
 
     .sidebar-logo-title {
         font-size: 19px !important;
@@ -736,11 +509,12 @@ hr {
 
     /* --------------------------------------------------------
        CABEÇALHO DA PÁGINA
-       -------------------------------------------------------- */
+    -------------------------------------------------------- */
 
     .page-title {
         font-size: 24px !important;
     }
+
 
     .page-subtitle {
         font-size: 13px !important;
@@ -749,15 +523,18 @@ hr {
 
     /* --------------------------------------------------------
        CARDS
-       -------------------------------------------------------- */
+    -------------------------------------------------------- */
 
     .library-card {
         width: 100% !important;
+
         box-sizing: border-box !important;
     }
 
+
     .dashboard-card {
         width: 100% !important;
+
         box-sizing: border-box !important;
     }
 }
