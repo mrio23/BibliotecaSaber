@@ -4,7 +4,11 @@ from datetime import date
 from main import (
     cadastrar_livro,
     listar_livros,
+    cadastrar_aluno,
     listar_alunos,
+    aluno_possui_emprestimos,
+    excluir_aluno,
+    listar_auditoria,
     registrar_emprestimo,
     listar_emprestimos,
     registrar_devolucao
@@ -43,7 +47,8 @@ opcao = st.sidebar.selectbox(
         "Alunos",
         "Livros",
         "Cadastrar livro",
-        "Empréstimos"
+        "Empréstimos",
+        "Auditoria"
     ]
 )
 
@@ -60,24 +65,102 @@ if opcao == "Início":
         "Bem-vindo ao sistema Biblioteca Virtual Saber."
     )
 
+
 # ============================================================
 # LISTAR ALUNOS
 # ============================================================
 
 elif opcao == "Alunos":
-    st.header("📓 Alunos cadastrados")
+
+    st.header("📋 Cadastrar Aluno")
+    
+    nome = st.text_input(
+        "Nome do aluno"
+    )
+    
+    matricula = st.text_input(
+        "Matrícula"
+    )
+    
+    if st.button("Cadastrar aluno"):
+        if not nome or not matricula:
+            st.warning(
+                "Preencha os campos Nome e matrícula."
+            )
+            
+        else:
+            
+            try:
+                
+                cadastrar_aluno(
+                    nome,
+                    matricula
+                )
+                
+                
+                st.success(
+                    "Aluno cadastrado com sucesso!"
+                )
+                
+            except Exception:
+                
+                st.error(
+                    "Não foi possível cadastar o aluno momento. Tente novamente mais tarde."
+                )
+
+
+
+
+    st.subheader("📓 Alunos cadastrados")
     
     try:
         
         alunos = listar_alunos()
         
         if alunos:
-            
-            st.dataframe(
-                alunos,
-                use_container_width=True
-            )
-        
+            for aluno in alunos:
+                aluno_id = aluno[0]
+                nome = aluno[1]
+                matricula = aluno[2]
+                
+                col1,col2,col3 = st.columns([4, 3, 1])
+                
+                with col1:
+                    st.write(
+                        f"👤 **{nome}**"
+                    )
+                    
+                with col2:
+                    st.write(
+                        f"**{matricula}**"
+                    )
+                
+                with col3:
+                    if st.button(
+                        "Excluir",
+                        key=f"excluir_aluno_{aluno_id}"
+                    ):
+                        
+                        # st.write("ID do aluno:", aluno_id)
+                        
+                        try:
+                            
+                            if aluno_possui_emprestimos(aluno_id):
+                                st.warning(
+                                    f"⚠️ Não é possivel excluir o aluno **{nome}**, "
+                                    "pois ele possui um empréstimo ativo."
+                                )
+                            else:
+                                
+                                excluir_aluno(aluno_id)
+                                
+                                st.success(
+                                    f"Aluno **{nome}** exlucido com sucesso!"
+                                )
+                                
+                                st.rerun()
+                        except Exception as erro:
+                            st.error(str(erro))
         else:
             
             st.info(
@@ -103,11 +186,51 @@ elif opcao == "Livros":
 
         if livros:
 
-            st.dataframe(
-                livros,
-                use_container_width=True
-            )
+            for livro in livros:
+                livro_id = livro[0]
+                titulo = livro[1]
+                autor = livro[2]
+                ano_publicacao = livro[3]
+                quantidade = livro[4]
+                
+                col1, col2, col3, col4, col5 = st.columns(
+                    [3, 2.5, 1.5, 1.5, 1]
+                )
+                
+                with col1:
+                    
+                    st.write(
+                        f"📚 **{titulo}**"
+                    )
+                    
+                with col2:
+                    
+                    st.write(
+                        f"✍️ {autor}"
+                    )
+                    
+                with col3:
+                    
+                    st.write(
+                        f"📅 {ano_publicacao}"
+                    )
+                    
+                with col4:
+                    
+                    st.write(
+                        f"📦 {quantidade}"
+                    )
 
+                with col5:
+                    
+                    st.button (
+                        "Excluir",
+                        key=f"excluir_livro_{livro_id}"
+                    )
+                    
+                    st.divider()
+                    
+                    
         else:
 
             st.info(
@@ -341,6 +464,13 @@ elif opcao == "Empréstimos":
                             "🟢 DEVOLVIDO"
                         )
 
+
+                    elif status == "ATRASADO":
+                        
+                        st.error(
+                            "🔴 ATRASADO"
+                        )
+                    
                     elif status == "ATIVO":
 
                         if (
@@ -375,7 +505,7 @@ elif opcao == "Empréstimos":
 
                 with col6:
 
-                    if status == "ATIVO":
+                    if status in ("ATIVO", "ATRASADO"):
 
                         if st.button(
                             "Registrar devolução",
@@ -432,7 +562,74 @@ elif opcao == "Empréstimos":
             f"Erro ao consultar empréstimos: {erro}"
         )
 
+# ===========================================
+# AUDITORIA
+# ===========================================
 
+elif opcao == "Auditoria":
+    st.header("📋 Auditoria")
+    st.write(
+        "Histórico de operações."
+    )
+    
+    try:
+        
+        auditoria = listar_auditoria()
+        
+        if auditoria:
+            
+            for registro in auditoria:
+                
+                (
+                    auditoria_id,
+                    acao,
+                    entidade,
+                    entidade_id,
+                    dados,
+                    data_hora
+                ) = registro
+                
+                col1, col2, col3, col4 = st.columns(
+                    [2, 2, 2, 3]
+                )
+                
+                with col1:
+                    
+                    st.write(
+                        f"📅 {data_hora}"
+                    )
+                    
+                with col2:
+                    
+                    st.write(
+                        f"🔹 **{acao}**"
+                    )
+                    
+                with col3:
+                    
+                    st.write(
+                        f"📂 {entidade}"
+                    )
+                    
+                with col4:
+                    
+                    st.write(
+                        f"📝 {dados}"
+                    )
+                    
+                st.divider()
+                
+            else:
+                
+                st.info(
+                    "Nenhum registro de auditoria foi encontrado."
+                )
+                
+    except Exception:
+        st.error(
+            "Não foi possível carregar os registros de auditoria."
+        )
+        
 # ===========================================
 # RODAPÉ
 # ===========================================
