@@ -7,7 +7,8 @@ def cadastrar_livro(
     titulo,
     autor,
     ano_publicacao,
-    quantidade
+    quantidade,
+    categoria,
 ):
 
     with get_connection() as conexao:
@@ -20,13 +21,15 @@ def cadastrar_livro(
                         titulo,
                         autor,
                         ano_publicacao,
-                        quantidade
+                        quantidade,
+                        categoria
                     )
                     VALUES (
                         :titulo,
                         :autor,
                         :ano_publicacao,
-                        :quantidade
+                        :quantidade,
+                        :categoria
                     )
                     RETURNING id
                 """),
@@ -34,7 +37,8 @@ def cadastrar_livro(
                     "titulo": titulo,
                     "autor": autor,
                     "ano_publicacao": ano_publicacao,
-                    "quantidade": quantidade
+                    "quantidade": quantidade,
+                    "categoria": categoria
                 }
             )
 
@@ -50,7 +54,8 @@ def cadastrar_livro(
                     "titulo": titulo,
                     "autor": autor,
                     "ano_publicacao": ano_publicacao,
-                    "quantidade": quantidade
+                    "quantidade": quantidade,
+                    "categoria": categoria,
                 }
             )
 
@@ -110,7 +115,8 @@ def excluir_livro(livro_id):
                         titulo,
                         autor,
                         ano_publicacao,
-                        quantidade
+                        quantidade,
+                        categoria
                     FROM livros
                     WHERE id = :livro_id
                 """),
@@ -130,7 +136,8 @@ def excluir_livro(livro_id):
                 titulo,
                 autor,
                 ano_publicacao,
-                quantidade
+                quantidade,
+                categoria,
             ) = livro
 
             # Verificar empréstimos
@@ -164,7 +171,8 @@ def excluir_livro(livro_id):
                     "titulo": titulo,
                     "autor": autor,
                     "ano_publicacao": ano_publicacao,
-                    "quantidade": quantidade
+                    "quantidade": quantidade,
+                    "categoria": categoria
                 }
             )
 

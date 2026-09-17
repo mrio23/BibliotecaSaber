@@ -10,11 +10,7 @@
     --saber-red: #C62828;
     --saber-red-dark: #A61F1F;
     --saber-red-light: #FDECEC;
-    --surface: #FFFFFF;
-    --background: #F5F7FA;
-    --text: #1E293B;
-    --muted: #64748B;
-    --border: #E2E8F0;
+    
     --success: #17835B;
     --success-light: #EAF7F1;
     --warning: #B7791F;
@@ -27,15 +23,6 @@
 /* ============================================================
    BASE STREAMLIT
    ============================================================ */
-
-.stApp {
-    background: var(--background);
-    color: var(--text);
-}
-
-[data-testid="stAppViewContainer"] {
-    background: var(--background);
-}
 
 [data-testid="stHeader"] {
     background: transparent;
@@ -65,16 +52,6 @@ hr {
 /* ============================================================
    SIDEBAR
    ============================================================ */
-
-section[data-testid="stSidebar"] {
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-}
-
-section[data-testid="stSidebar"] > div:first-child {
-    background: var(--surface);
-    padding: 1.25rem .9rem;
-}
 
 section[data-testid="stSidebar"] .block-container {
     padding-top: 1rem;
@@ -226,6 +203,8 @@ section[data-testid="stSidebar"] .stButton > button:hover {
     font-size: 27px;
 }
 
+
+
 .page-kicker {
     color: var(--saber-red);
     font-size: 10px;
@@ -330,8 +309,15 @@ section[data-testid="stSidebar"] .stButton > button:hover {
     font-size: 20px;
 }
 
-.metric-red .metric-icon {
-    background: var(--saber-red-light);
+/* Modo escuro */
+@media (prefers-color-scheme: dark) {
+    .metric-icon {
+        background: #1A3048;
+    }
+
+    .metric-red .metric-icon {
+        background: #3A2020;
+    }
 }
 
 .metric-dot {

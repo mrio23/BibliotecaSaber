@@ -365,8 +365,8 @@ elif opcao == "Livros":
         livros = listar_livros()
         if livros:
             for livro in livros:
-                livro_id, titulo, autor, ano_publicacao, quantidade = (
-                    livro[0], livro[1], livro[2], livro[3], livro[4]
+                livro_id, titulo, autor, ano_publicacao, quantidade, categoria = (
+                    livro[0], livro[1], livro[2], livro[3], livro[4], livro[5]
                 )
                 disponivel = quantidade > 0
                 disponibilidade = "Disponível" if disponivel else "Indisponível"
@@ -385,6 +385,7 @@ elif opcao == "Livros":
                                 <div class="book-details">
                                     <div><span>Ano</span><strong>{ano_publicacao}</strong></div>
                                     <div><span>Exemplares</span><strong>{quantidade}</strong></div>
+                                    <div><span>Categoria</span><strong>{categoria}</strong></div>
                                     <div><span>Status</span><strong class="book-status {status_classe}">● {disponibilidade}</strong></div>
                                 </div>
                             </div>
@@ -434,18 +435,20 @@ elif opcao == "Cadastrar livro":
     with col2:
         autor = st.text_input("Autor", placeholder="Ex.: Machado de Assis")
 
-    col3, col4 = st.columns(2)
+    col3, col4, col5 = st.columns(3)
     with col3:
         ano_publicacao = st.number_input("Ano de publicação", min_value=0, step=1)
     with col4:
         quantidade = st.number_input("Quantidade", min_value=1, step=1)
-
+    with col5:
+        categoria = st.text_input("Categoria", placeholder="Ex.: Suspense")
+        
     if st.button("Cadastrar livro", use_container_width=True, key="cadastrar_livro"):
         if not titulo or not autor:
             st.warning("Preencha o título e o autor.")
         else:
             try:
-                cadastrar_livro(titulo, autor, ano_publicacao, quantidade)
+                cadastrar_livro(titulo, autor, ano_publicacao, quantidade, categoria)
                 st.success("Livro cadastrado com sucesso!")
             except Exception:
                 st.error(
