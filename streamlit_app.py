@@ -20,6 +20,66 @@ from main import (
     contar_emprestimos_atrasados,
 )
 
+# ============================================================
+# TEMA DA INTERFACE
+# ============================================================
+
+tema = st.context.theme.type
+
+if tema == "dark":
+    css_tema = """
+    <style>
+    :root {
+        --saber-surface: #0F1117;
+        --saber-surface-secondary: #151922;
+
+        --saber-detail-bg: #1B2029;
+        --saber-detail-border: #2A313D;
+
+        --saber-text: #F1F5F9;
+        --saber-muted: #AAB4C2;
+
+        --saber-border: #2B3440;
+
+        --saber-neutral-bg: #252D37;
+        --saber-neutral-text: #AAB4C2;
+
+        --saber-hover: #202631;
+    }
+    </style>
+    """
+else:
+    css_tema = """
+    <style>
+    :root {
+        --saber-surface: #FFFFFF;
+        --saber-surface-secondary: #F8FAFC;
+
+        --saber-detail-bg: #F8FAFC;
+        --saber-detail-border: #EEF2F7;
+
+        --saber-text: #1E293B;
+        --saber-muted: #64748B;
+
+        --saber-border: #E2E8F0;
+
+        --saber-neutral-bg: #F1F5F9;
+        --saber-neutral-text: #64748B;
+
+        --saber-hover: #F1F5F9;
+    }
+    </style>
+    """
+    
+# ============================================================
+# CARREGAMENTO DO CSS
+# ============================================================
+
+with open("style.css", "r", encoding="utf-8") as f:
+    css = f.read()
+
+st.markdown(css_tema, unsafe_allow_html=True)
+st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
 
 # ============================================================
 # CONFIGURAÇÃO

@@ -4,21 +4,87 @@
    ============================================================ */
 
 :root {
+    /* ========================================================
+       CORES INSTITUCIONAIS
+       ======================================================== */
+
     --saber-blue: #174A7E;
     --saber-blue-dark: #10385F;
-    --saber-blue-light: #EAF2F8;
+
     --saber-red: #C62828;
     --saber-red-dark: #A61F1F;
-    --saber-red-light: #FDECEC;
-    
+
     --success: #17835B;
-    --success-light: #EAF7F1;
     --warning: #B7791F;
-    --warning-light: #FFF7E6;
+
+    /*
+       As cores abaixo acompanham o tema atual do Streamlit.
+       Não definimos --surface, --text, --muted ou --border
+       manualmente para não entrar em conflito com Light/Dark.
+    */
+
+    --saber-blue-light: color-mix(
+        in srgb,
+        var(--saber-surface, #FFFFFF) 88%,
+        var(--saber-blue) 12%
+    );
+
+    --saber-red-light: color-mix(
+        in srgb,
+        var(--surface, #FFFFFF) 90%,
+        var(--saber-red) 10%
+    );
+
+    --success-light: color-mix(
+        in srgb,
+        var(--surface, #FFFFFF) 90%,
+        var(--success) 10%
+    );
+
+    --warning-light: color-mix(
+        in srgb,
+        var(--surface, #FFFFFF) 90%,
+        var(--warning) 10%
+    );
+
+    --detail-bg: color-mix(
+        in srgb,
+        var(--surface, #FFFFFF) 94%,
+        var(--text, #1E293B) 6%
+    );
+
+    --detail-border: var(--border, #E2E8F0);
+
+    --neutral-bg: color-mix(
+        in srgb,
+        var(--surface, #FFFFFF) 90%,
+        var(--text, #1E293B) 10%
+    );
+
+    --neutral-text: var(--muted, #64748B);
+
+    --sidebar-text: var(--muted, #475569);
+
+    --sidebar-label: var(--muted, #94A3B8);
+
+    --footer-text: var(--muted, #94A3B8);
+
+    --danger-border: color-mix(
+        in srgb,
+        var(--saber-red) 35%,
+        var(--border, #E2E8F0) 65%
+    );
+
+    /* ========================================================
+       SOMBRAS
+       ======================================================== */
+
     --shadow-sm: 0 2px 8px rgba(15, 23, 42, .04);
     --shadow-md: 0 8px 24px rgba(15, 23, 42, .07);
+
     --radius: 16px;
 }
+
 
 /* ============================================================
    BASE STREAMLIT
@@ -34,7 +100,10 @@
     padding-bottom: 2rem;
 }
 
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
     color: var(--text);
     letter-spacing: -.02em;
 }
@@ -48,6 +117,7 @@ hr {
     border-top: 1px solid var(--border);
     margin: 1.5rem 0;
 }
+
 
 /* ============================================================
    SIDEBAR
@@ -113,7 +183,7 @@ section[data-testid="stSidebar"] .block-container {
     font-size: 10px;
     font-weight: 800;
     letter-spacing: .12em;
-    color: #94A3B8;
+    color: var(--sidebar-label);
 }
 
 section[data-testid="stSidebar"] .stButton {
@@ -128,15 +198,15 @@ section[data-testid="stSidebar"] .stButton > button {
     border: 1px solid transparent;
     border-radius: 10px;
     background: transparent;
-    color: #475569;
+    color: var(--sidebar-text);
     font-size: 13px;
     font-weight: 600;
     transition: all .18s ease;
 }
 
 section[data-testid="stSidebar"] .stButton > button:hover {
-    background: var(--saber-blue-light);
-    border-color: #D8E7F4;
+    background: var(--saber-hover);
+    border-color: var(--border);
     color: var(--saber-blue);
     transform: translateX(2px);
 }
@@ -160,10 +230,11 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 }
 
 .sidebar-year {
-    color: #94A3B8;
+    color: var(--sidebar-label);
     font-size: 10px;
     margin-top: 4px;
 }
+
 
 /* ============================================================
    CABEÇALHO DAS PÁGINAS
@@ -203,8 +274,6 @@ section[data-testid="stSidebar"] .stButton > button:hover {
     font-size: 27px;
 }
 
-
-
 .page-kicker {
     color: var(--saber-red);
     font-size: 10px;
@@ -223,6 +292,7 @@ section[data-testid="stSidebar"] .stButton > button:hover {
     margin: 4px 0 0;
     font-size: 13px;
 }
+
 
 /* ============================================================
    SEÇÕES
@@ -250,6 +320,7 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 .home-spacer {
     height: 34px;
 }
+
 
 /* ============================================================
    DASHBOARD
@@ -306,18 +377,13 @@ section[data-testid="stSidebar"] .stButton > button:hover {
     justify-content: center;
     border-radius: 12px;
     background: var(--saber-blue-light);
+    color: var(--saber-blue);
     font-size: 20px;
 }
 
-/* Modo escuro */
-@media (prefers-color-scheme: dark) {
-    .metric-icon {
-        background: #1A3048;
-    }
-
-    .metric-red .metric-icon {
-        background: #3A2020;
-    }
+.metric-red .metric-icon {
+    background: var(--saber-red-light);
+    color: var(--saber-red);
 }
 
 .metric-dot {
@@ -348,9 +414,10 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 
 .metric-description {
     margin-top: 7px;
-    color: #94A3B8;
+    color: var(--muted);
     font-size: 11px;
 }
+
 
 /* ============================================================
    ACESSO RÁPIDO
@@ -377,6 +444,7 @@ section[data-testid="stSidebar"] .stButton > button:hover {
     justify-content: center;
     border-radius: 11px;
     background: var(--saber-blue-light);
+    color: var(--saber-blue);
     font-size: 20px;
 }
 
@@ -395,6 +463,7 @@ section[data-testid="stSidebar"] .stButton > button:hover {
     border-top: 0;
     border-radius: 0 0 14px 14px;
 }
+
 
 /* ============================================================
    CARDS DE ENTIDADES / LIVROS / EMPRÉSTIMOS
@@ -441,6 +510,7 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 .blue-icon,
 .book-cover {
     background: var(--saber-blue-light);
+    color: var(--saber-blue);
 }
 
 .entity-main {
@@ -481,6 +551,7 @@ section[data-testid="stSidebar"] .stButton > button:hover {
     height: 18px;
 }
 
+
 /* ============================================================
    LIVRO
    ============================================================ */
@@ -501,6 +572,7 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 .book-author {
     margin: 4px 0 14px;
     font-size: 12px;
+    color: var(--muted);
 }
 
 .book-details {
@@ -512,8 +584,8 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 .book-details > div {
     min-width: 100px;
     padding: 8px 10px;
-    background: #F8FAFC;
-    border: 1px solid #EEF2F7;
+    background: var(--detail-bg);
+    border: 1px solid var(--detail-border);
     border-radius: 9px;
 }
 
@@ -521,7 +593,7 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 .loan-info-grid span {
     display: block;
     margin-bottom: 3px;
-    color: #94A3B8;
+    color: var(--muted);
     font-size: 9px;
     font-weight: 700;
     text-transform: uppercase;
@@ -540,6 +612,7 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 .book-status.unavailable {
     color: var(--saber-red);
 }
+
 
 /* ============================================================
    EMPRÉSTIMOS
@@ -568,7 +641,8 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 
 .loan-info-grid > div {
     padding: 8px 10px;
-    background: #F8FAFC;
+    background: var(--detail-bg);
+    border: 1px solid var(--detail-border);
     border-radius: 9px;
 }
 
@@ -605,8 +679,8 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 
 .status-cancelled,
 .status-neutral {
-    color: #64748B;
-    background: #F1F5F9;
+    color: var(--neutral-text);
+    background: var(--neutral-bg);
 }
 
 .returned-action,
@@ -622,9 +696,10 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 }
 
 .cancelled-action {
-    background: #F1F5F9;
-    color: #64748B;
+    background: var(--neutral-bg);
+    color: var(--neutral-text);
 }
+
 
 /* ============================================================
    AUDITORIA
@@ -670,7 +745,7 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 }
 
 .audit-date {
-    color: #94A3B8;
+    color: var(--muted);
     font-size: 10px;
 }
 
@@ -689,12 +764,14 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 .audit-data {
     margin-top: 8px;
     padding: 8px 10px;
-    background: #F8FAFC;
+    background: var(--detail-bg);
+    border: 1px solid var(--detail-border);
     border-radius: 8px;
-    color: #64748B;
+    color: var(--muted);
     font-size: 10px;
     word-break: break-word;
 }
+
 
 /* ============================================================
    FORMULÁRIOS E BOTÕES NATIVOS
@@ -706,6 +783,7 @@ section[data-testid="stSidebar"] .stButton > button:hover {
     border-radius: 10px;
     border: 1px solid var(--border);
     background: var(--surface);
+    color: var(--text);
 }
 
 [data-testid="stTextInput"] input:focus,
@@ -740,7 +818,7 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 /* Exclusão usa o vermelho institucional sem deixar toda a interface vermelha. */
 .stButton > button[aria-label*="Excluir"] {
     background: var(--surface);
-    border-color: #E5B4B4;
+    border-color: var(--danger-border);
     color: var(--saber-red);
 }
 
@@ -749,6 +827,7 @@ section[data-testid="stSidebar"] .stButton > button:hover {
     border-color: var(--saber-red);
     color: var(--saber-red-dark);
 }
+
 
 /* ============================================================
    ESTADO VAZIO
@@ -759,7 +838,7 @@ section[data-testid="stSidebar"] .stButton > button:hover {
     margin-top: 10px;
     text-align: center;
     background: var(--surface);
-    border: 1px dashed #CBD5E1;
+    border: 1px dashed var(--border);
     border-radius: 15px;
 }
 
@@ -772,6 +851,7 @@ section[data-testid="stSidebar"] .stButton > button:hover {
     margin: 0 auto 10px;
     border-radius: 50%;
     background: var(--saber-blue-light);
+    color: var(--saber-blue);
     font-size: 22px;
 }
 
@@ -785,6 +865,7 @@ section[data-testid="stSidebar"] .stButton > button:hover {
     font-size: 11px;
 }
 
+
 /* ============================================================
    RODAPÉ
    ============================================================ */
@@ -793,7 +874,7 @@ section[data-testid="stSidebar"] .stButton > button:hover {
     margin-top: 4rem;
     padding: 1.5rem 0 .5rem;
     text-align: center;
-    color: #94A3B8;
+    color: var(--footer-text);
     font-size: 10px;
     line-height: 1.7;
 }
@@ -814,6 +895,7 @@ section[data-testid="stSidebar"] .stButton > button:hover {
     letter-spacing: .12em;
 }
 
+
 /* ============================================================
    ALERTAS NATIVAS DO STREAMLIT
    ============================================================ */
@@ -821,6 +903,7 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 [data-testid="stAlert"] {
     border-radius: 10px;
 }
+
 
 /* ============================================================
    RESPONSIVIDADE
