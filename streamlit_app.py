@@ -42,6 +42,7 @@ if tema == "dark":
     css_tema = """
     <style>
     :root {
+        color-scheme: dark;
         --saber-surface: #0F1117;
         --saber-surface-secondary: #151922;
         --saber-detail-bg: #1B2029;
@@ -59,6 +60,7 @@ else:
     css_tema = """
     <style>
     :root {
+        color-scheme: light;
         --saber-surface: #FFFFFF;
         --saber-surface-secondary: #F8FAFC;
         --saber-detail-bg: #F8FAFC;
