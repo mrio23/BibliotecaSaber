@@ -17,11 +17,8 @@
     --success: #17835B;
     --warning: #B7791F;
 
-    /*
-       As cores abaixo acompanham o tema atual do Streamlit.
-       Não definimos --surface, --text, --muted ou --border
-       manualmente para não entrar em conflito com Light/Dark.
-    */
+    /* As cores de superfície, texto e borda são definidas pelo
+       tema da Biblioteca Saber em streamlit_app.py. */
 
     --saber-blue-light: color-mix(
         in srgb,
@@ -31,48 +28,48 @@
 
     --saber-red-light: color-mix(
         in srgb,
-        var(--surface, #FFFFFF) 90%,
+        var(--saber-surface, #FFFFFF) 90%,
         var(--saber-red) 10%
     );
 
     --success-light: color-mix(
         in srgb,
-        var(--surface, #FFFFFF) 90%,
+        var(--saber-surface, #FFFFFF) 90%,
         var(--success) 10%
     );
 
     --warning-light: color-mix(
         in srgb,
-        var(--surface, #FFFFFF) 90%,
+        var(--saber-surface, #FFFFFF) 90%,
         var(--warning) 10%
     );
 
     --detail-bg: color-mix(
         in srgb,
-        var(--surface, #FFFFFF) 94%,
-        var(--text, #1E293B) 6%
+        var(--saber-surface, #FFFFFF) 94%,
+        var(--saber-text, #1E293B) 6%
     );
 
-    --detail-border: var(--border, #E2E8F0);
+    --detail-border: var(--saber-border, #E2E8F0);
 
     --neutral-bg: color-mix(
         in srgb,
-        var(--surface, #FFFFFF) 90%,
-        var(--text, #1E293B) 10%
+        var(--saber-surface, #FFFFFF) 90%,
+        var(--saber-text, #1E293B) 10%
     );
 
-    --neutral-text: var(--muted, #64748B);
+    --neutral-text: var(--saber-muted, #64748B);
 
-    --sidebar-text: var(--muted, #475569);
+    --sidebar-text: var(--saber-muted, #475569);
 
-    --sidebar-label: var(--muted, #94A3B8);
+    --sidebar-label: var(--saber-muted, #94A3B8);
 
-    --footer-text: var(--muted, #94A3B8);
+    --footer-text: var(--saber-muted, #94A3B8);
 
     --danger-border: color-mix(
         in srgb,
         var(--saber-red) 35%,
-        var(--border, #E2E8F0) 65%
+        var(--saber-border, #E2E8F0) 65%
     );
 
     /* ========================================================
@@ -104,17 +101,17 @@ h1,
 h2,
 h3,
 h4 {
-    color: var(--text);
+    color: var(--saber-text);
     letter-spacing: -.02em;
 }
 
 p {
-    color: var(--muted);
+    color: var(--saber-muted);
 }
 
 hr {
     border: 0;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--saber-border);
     margin: 1.5rem 0;
 }
 
@@ -131,7 +128,7 @@ section[data-testid="stSidebar"] .block-container {
     position: relative;
     padding: 1rem .8rem 1.35rem;
     margin-bottom: 1rem;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--saber-border);
 }
 
 .brand-block::after {
@@ -175,7 +172,7 @@ section[data-testid="stSidebar"] .block-container {
     margin-top: .4rem;
     font-size: 11px;
     line-height: 1.5;
-    color: var(--muted);
+    color: var(--saber-muted);
 }
 
 .sidebar-label {
@@ -183,7 +180,7 @@ section[data-testid="stSidebar"] .block-container {
     font-size: 10px;
     font-weight: 800;
     letter-spacing: .12em;
-    color: var(--sidebar-label);
+    color: var(--saber-muted);
 }
 
 section[data-testid="stSidebar"] .stButton {
@@ -198,7 +195,7 @@ section[data-testid="stSidebar"] .stButton > button {
     border: 1px solid transparent;
     border-radius: 10px;
     background: transparent;
-    color: var(--sidebar-text);
+    color: var(--saber-muted);
     font-size: 13px;
     font-weight: 600;
     transition: all .18s ease;
@@ -206,7 +203,7 @@ section[data-testid="stSidebar"] .stButton > button {
 
 section[data-testid="stSidebar"] .stButton > button:hover {
     background: var(--saber-hover);
-    border-color: var(--border);
+    border-color: var(--saber-border);
     color: var(--saber-blue);
     transform: translateX(2px);
 }
@@ -219,7 +216,7 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 .sidebar-bottom {
     margin: 2rem .8rem 0;
     padding-top: 1rem;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--saber-border);
 }
 
 .sidebar-school {
@@ -230,7 +227,7 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 }
 
 .sidebar-year {
-    color: var(--sidebar-label);
+    color: var(--saber-muted);
     font-size: 10px;
     margin-top: 4px;
 }
@@ -246,7 +243,7 @@ section[data-testid="stSidebar"] .stButton > button:hover {
     gap: 18px;
     margin-bottom: 2rem;
     padding-bottom: 1.45rem;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--saber-border);
     position: relative;
 }
 
@@ -337,8 +334,8 @@ section[data-testid="stSidebar"] .stButton > button:hover {
     position: relative;
     overflow: hidden;
     padding: 20px;
-    background: var(--surface);
-    border: 1px solid var(--border);
+    background: var(--saber-surface);
+    border: 1px solid var(--saber-border);
     border-radius: var(--radius);
     box-shadow: var(--shadow-sm);
     transition: transform .2s ease, box-shadow .2s ease;
@@ -399,14 +396,14 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 
 .metric-title {
     margin-top: 17px;
-    color: var(--muted);
+    color: var(--saber-muted);
     font-size: 12px;
     font-weight: 650;
 }
 
 .metric-value {
     margin-top: 2px;
-    color: var(--text);
+    color: var(--saber-text);
     font-size: 31px;
     font-weight: 800;
     line-height: 1.15;
@@ -414,7 +411,7 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 
 .metric-description {
     margin-top: 7px;
-    color: var(--muted);
+    color: var(--saber-muted);
     font-size: 11px;
 }
 
@@ -429,8 +426,8 @@ section[data-testid="stSidebar"] .stButton > button:hover {
     gap: 13px;
     min-height: 88px;
     padding: 16px;
-    background: var(--surface);
-    border: 1px solid var(--border);
+    background: var(--saber-surface);
+    border: 1px solid var(--saber-border);
     border-radius: 14px 14px 0 0;
     box-shadow: var(--shadow-sm);
 }
@@ -473,8 +470,8 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 .book-card,
 .loan-card,
 .audit-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
+    background: var(--saber-surface);
+    border: 1px solid var(--saber-border);
     box-shadow: var(--shadow-sm);
 }
 
@@ -540,11 +537,11 @@ section[data-testid="stSidebar"] .stButton > button:hover {
     align-items: center;
     margin-top: 8px;
     font-size: 11px;
-    color: var(--muted);
+    color: var(--saber-muted);
 }
 
 .entity-meta strong {
-    color: var(--text);
+    color: var(--saber-text);
 }
 
 .action-spacer {
@@ -572,7 +569,7 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 .book-author {
     margin: 4px 0 14px;
     font-size: 12px;
-    color: var(--muted);
+    color: var(--saber-muted);
 }
 
 .book-details {
@@ -584,8 +581,8 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 .book-details > div {
     min-width: 100px;
     padding: 8px 10px;
-    background: var(--detail-bg);
-    border: 1px solid var(--detail-border);
+    background: var(--saber-detail-bg);
+    border: 1px solid var(--saber-detail-border);
     border-radius: 9px;
 }
 
@@ -593,7 +590,7 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 .loan-info-grid span {
     display: block;
     margin-bottom: 3px;
-    color: var(--muted);
+    color: var(--saber-muted);
     font-size: 9px;
     font-weight: 700;
     text-transform: uppercase;
@@ -601,7 +598,7 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 }
 
 .book-details strong {
-    color: var(--text);
+    color: var(--saber-text);
     font-size: 11px;
 }
 
@@ -636,18 +633,18 @@ section[data-testid="stSidebar"] .stButton > button:hover {
     gap: 12px;
     margin-top: 17px;
     padding-top: 14px;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--saber-border);
 }
 
 .loan-info-grid > div {
     padding: 8px 10px;
-    background: var(--detail-bg);
-    border: 1px solid var(--detail-border);
+    background: var(--saber-detail-bg);
+    border: 1px solid var(--saber-detail-border);
     border-radius: 9px;
 }
 
 .loan-info-grid strong {
-    color: var(--text);
+    color: var(--saber-text);
     font-size: 11px;
     font-weight: 650;
 }
@@ -679,8 +676,8 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 
 .status-cancelled,
 .status-neutral {
-    color: var(--neutral-text);
-    background: var(--neutral-bg);
+    color: var(--saber-neutral-text);
+    background: var(--saber-neutral-bg);
 }
 
 .returned-action,
@@ -696,8 +693,8 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 }
 
 .cancelled-action {
-    background: var(--neutral-bg);
-    color: var(--neutral-text);
+    background: var(--saber-neutral-bg);
+    color: var(--saber-neutral-text);
 }
 
 
@@ -745,7 +742,7 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 }
 
 .audit-date {
-    color: var(--muted);
+    color: var(--saber-muted);
     font-size: 10px;
 }
 
@@ -753,21 +750,21 @@ section[data-testid="stSidebar"] .stButton > button:hover {
     display: flex;
     gap: 16px;
     margin-top: 6px;
-    color: var(--muted);
+    color: var(--saber-muted);
     font-size: 10px;
 }
 
 .audit-details strong {
-    color: var(--text);
+    color: var(--saber-text);
 }
 
 .audit-data {
     margin-top: 8px;
     padding: 8px 10px;
-    background: var(--detail-bg);
-    border: 1px solid var(--detail-border);
+    background: var(--saber-detail-bg);
+    border: 1px solid var(--saber-detail-border);
     border-radius: 8px;
-    color: var(--muted);
+    color: var(--saber-muted);
     font-size: 10px;
     word-break: break-word;
 }
@@ -781,9 +778,9 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 [data-testid="stNumberInput"] input,
 [data-testid="stDateInput"] input {
     border-radius: 10px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text);
+    border: 1px solid var(--saber-border);
+    background: var(--saber-surface);
+    color: var(--saber-text);
 }
 
 [data-testid="stTextInput"] input:focus,
@@ -817,7 +814,7 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 
 /* Exclusão usa o vermelho institucional sem deixar toda a interface vermelha. */
 .stButton > button[aria-label*="Excluir"] {
-    background: var(--surface);
+    background: var(--saber-surface);
     border-color: var(--danger-border);
     color: var(--saber-red);
 }
@@ -837,8 +834,8 @@ section[data-testid="stSidebar"] .stButton > button:hover {
     padding: 42px 20px;
     margin-top: 10px;
     text-align: center;
-    background: var(--surface);
-    border: 1px dashed var(--border);
+    background: var(--saber-surface);
+    border: 1px dashed var(--saber-border);
     border-radius: 15px;
 }
 
@@ -874,7 +871,7 @@ section[data-testid="stSidebar"] .stButton > button:hover {
     margin-top: 4rem;
     padding: 1.5rem 0 .5rem;
     text-align: center;
-    color: var(--footer-text);
+    color: var(--saber-muted);
     font-size: 10px;
     line-height: 1.7;
 }
