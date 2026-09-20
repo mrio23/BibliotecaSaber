@@ -117,6 +117,81 @@ hr {
 
 
 /* ============================================================
+   CAMADA DE TEMA DO STREAMLIT
+   Mantém os componentes nativos sincronizados com o tema Saber.
+   ============================================================ */
+
+html,
+body,
+.stApp,
+[data-testid="stAppViewContainer"],
+[data-testid="stMain"] {
+    background: var(--saber-surface) !important;
+    color: var(--saber-text) !important;
+}
+
+[data-testid="stMainBlockContainer"] {
+    color: var(--saber-text) !important;
+}
+
+/* Texto e rótulos dos widgets nativos. */
+[data-testid="stWidgetLabel"],
+[data-testid="stWidgetLabel"] p,
+[data-testid="stWidgetLabel"] label {
+    color: var(--saber-text) !important;
+}
+
+/* Campos de texto, número e data. */
+[data-testid="stTextInput"] input,
+[data-testid="stNumberInput"] input,
+[data-testid="stDateInput"] input,
+[data-testid="stTextArea"] textarea {
+    background: var(--saber-surface) !important;
+    color: var(--saber-text) !important;
+    border-color: var(--saber-border) !important;
+    caret-color: var(--saber-text);
+}
+
+[data-testid="stTextInput"] input::placeholder,
+[data-testid="stNumberInput"] input::placeholder,
+[data-testid="stDateInput"] input::placeholder,
+[data-testid="stTextArea"] textarea::placeholder {
+    color: var(--saber-muted) !important;
+    opacity: .85;
+}
+
+/* Botões internos do number input. */
+[data-testid="stNumberInput"] button {
+    background: var(--saber-surface-secondary) !important;
+    color: var(--saber-text) !important;
+    border-color: var(--saber-border) !important;
+}
+
+[data-testid="stNumberInput"] button:hover {
+    background: var(--saber-hover) !important;
+}
+
+/* Sidebar nativa acompanha o mesmo fundo e texto do tema. */
+section[data-testid="stSidebar"],
+section[data-testid="stSidebar"] > div {
+    background: var(--saber-surface) !important;
+    color: var(--saber-text) !important;
+}
+
+/* Container inferior do Streamlit. */
+[data-testid="stBottom"] {
+    background: var(--saber-surface) !important;
+}
+
+/* Remove a dependência visual do tema nativo nos estados de foco. */
+input:focus,
+textarea:focus,
+button:focus {
+    outline-color: var(--saber-blue) !important;
+}
+
+
+/* ============================================================
    SIDEBAR
    ============================================================ */
 
