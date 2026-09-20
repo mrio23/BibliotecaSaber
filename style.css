@@ -17,69 +17,112 @@
     --success: #17835B;
     --warning: #B7791F;
 
-    /* As cores de superfície, texto e borda são definidas pelo
-       tema da Biblioteca Saber em streamlit_app.py. */
+    --shadow-sm: 0 2px 8px rgba(15, 23, 42, .04);
+    --shadow-md: 0 8px 24px rgba(15, 23, 42, .07);
+
+    --radius: 16px;
+}
+
+/* ============================================================
+   TEMA DINÂMICO — HERDA O TEMA NATIVO DO STREAMLIT
+   ============================================================ */
+
+/*
+   IMPORTANTE:
+   As variáveis --st-* do Streamlit ficam no contexto da aplicação.
+   Por isso, as variáveis --saber-* precisam ser definidas em um
+   elemento dentro da árvore do Streamlit, e não em :root.
+
+   Dessa forma, quando o usuário alterna Light/Dark, o navegador
+   recalcula as variáveis automaticamente, sem depender de rerun
+   do Python.
+*/
+
+/* ============================================================
+   TEMA NATIVO DO STREAMLIT
+   ============================================================ */
+
+.stApp {
+    background: var(--st-background-color);
+    color: var(--st-text-color);
+
+    --saber-surface: var(--st-background-color);
+    --saber-surface-secondary: var(--st-secondary-background-color);
+    --saber-text: var(--st-text-color);
+
+    --saber-border: var(--st-border-color);
+    --saber-detail-border: var(--st-border-color-light);
+
+
+    --saber-muted: color-mix(
+        in srgb,
+        var(--st-text-color) 62%,
+        var(--st-background-color) 38%
+    );
+
+    --saber-neutral-bg: color-mix(
+        in srgb,
+        var(--st-secondary-background-color) 72%,
+        var(--st-text-color) 28%
+    );
+
+    --saber-neutral-text: var(--saber-muted);
+
+    --saber-hover: color-mix(
+        in srgb,
+        var(--st-secondary-background-color) 82%,
+        var(--st-text-color) 18%
+    );
 
     --saber-blue-light: color-mix(
         in srgb,
-        var(--saber-surface, #FFFFFF) 88%,
+        var(--st-background-color) 88%,
         var(--saber-blue) 12%
     );
 
     --saber-red-light: color-mix(
         in srgb,
-        var(--saber-surface, #FFFFFF) 90%,
+        var(--st-background-color) 90%,
         var(--saber-red) 10%
     );
 
     --success-light: color-mix(
         in srgb,
-        var(--saber-surface, #FFFFFF) 90%,
+        var(--st-background-color) 90%,
         var(--success) 10%
     );
 
     --warning-light: color-mix(
         in srgb,
-        var(--saber-surface, #FFFFFF) 90%,
+        var(--st-background-color) 90%,
         var(--warning) 10%
     );
 
     --detail-bg: color-mix(
         in srgb,
-        var(--saber-surface, #FFFFFF) 94%,
-        var(--saber-text, #1E293B) 6%
+        var(--st-background-color) 94%,
+        var(--st-text-color) 6%
     );
 
-    --detail-border: var(--saber-border, #E2E8F0);
+    --detail-border: var(--st-border-color);
 
     --neutral-bg: color-mix(
         in srgb,
-        var(--saber-surface, #FFFFFF) 90%,
-        var(--saber-text, #1E293B) 10%
+        var(--st-background-color) 90%,
+        var(--st-text-color) 10%
     );
 
-    --neutral-text: var(--saber-muted, #64748B);
+    --neutral-text: var(--saber-muted);
 
-    --sidebar-text: var(--saber-muted, #475569);
-
-    --sidebar-label: var(--saber-muted, #94A3B8);
-
-    --footer-text: var(--saber-muted, #94A3B8);
+    --sidebar-text: var(--saber-muted);
+    --sidebar-label: var(--saber-muted);
+    --footer-text: var(--saber-muted);
 
     --danger-border: color-mix(
         in srgb,
         var(--saber-red) 35%,
-        var(--saber-border, #E2E8F0) 65%
+        var(--st-border-color) 65%
     );
-
-    /* ========================================================
-       SOMBRAS
-       ======================================================== */
-
-    --shadow-sm: 0 2px 8px rgba(15, 23, 42, .04);
-    --shadow-md: 0 8px 24px rgba(15, 23, 42, .07);
-
-    --radius: 16px;
 }
 
 
@@ -113,81 +156,6 @@ hr {
     border: 0;
     border-top: 1px solid var(--saber-border);
     margin: 1.5rem 0;
-}
-
-
-/* ============================================================
-   CAMADA DE TEMA DO STREAMLIT
-   Mantém os componentes nativos sincronizados com o tema Saber.
-   ============================================================ */
-
-html,
-body,
-.stApp,
-[data-testid="stAppViewContainer"],
-[data-testid="stMain"] {
-    background: var(--saber-surface) !important;
-    color: var(--saber-text) !important;
-}
-
-[data-testid="stMainBlockContainer"] {
-    color: var(--saber-text) !important;
-}
-
-/* Texto e rótulos dos widgets nativos. */
-[data-testid="stWidgetLabel"],
-[data-testid="stWidgetLabel"] p,
-[data-testid="stWidgetLabel"] label {
-    color: var(--saber-text) !important;
-}
-
-/* Campos de texto, número e data. */
-[data-testid="stTextInput"] input,
-[data-testid="stNumberInput"] input,
-[data-testid="stDateInput"] input,
-[data-testid="stTextArea"] textarea {
-    background: var(--saber-surface) !important;
-    color: var(--saber-text) !important;
-    border-color: var(--saber-border) !important;
-    caret-color: var(--saber-text);
-}
-
-[data-testid="stTextInput"] input::placeholder,
-[data-testid="stNumberInput"] input::placeholder,
-[data-testid="stDateInput"] input::placeholder,
-[data-testid="stTextArea"] textarea::placeholder {
-    color: var(--saber-muted) !important;
-    opacity: .85;
-}
-
-/* Botões internos do number input. */
-[data-testid="stNumberInput"] button {
-    background: var(--saber-surface-secondary) !important;
-    color: var(--saber-text) !important;
-    border-color: var(--saber-border) !important;
-}
-
-[data-testid="stNumberInput"] button:hover {
-    background: var(--saber-hover) !important;
-}
-
-/* Sidebar nativa acompanha o mesmo fundo e texto do tema. */
-section[data-testid="stSidebar"],
-section[data-testid="stSidebar"] > div {
-    background: var(--saber-surface) !important;
-    color: var(--saber-text) !important;
-}
-
-/* Container inferior do Streamlit. */
-[data-testid="stBottom"] {
-    background: var(--saber-surface) !important;
-}
-
-/* Remove a dependência visual do tema nativo nos estados de foco. */
-input:focus,
-textarea:focus,
-button:focus {
-    outline-color: var(--saber-blue) !important;
 }
 
 
@@ -1086,4 +1054,21 @@ section[data-testid="stSidebar"] .stButton > button:hover {
     .audit-card {
         gap: 9px;
     }
+}
+
+/* TESTE DEFINITIVO DE BORDA */
+
+.metric-card,
+.entity-card,
+.book-card,
+.loan-card,
+.audit-card {
+    border: 1px solid var(--st-border-color) !important;
+    outline: none !important;
+}
+
+.book-details > div,
+.loan-info-grid > div,
+.audit-data {
+    border: 1px solid var(--st-border-color-light) !important;
 }
