@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+(() => {
 
     // ============================================================
     // BIBLIOTECA SABER — INTERAÇÕES VISUAIS
@@ -26,7 +26,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 botao.classList.remove("saber-click");
 
-                // Força a animação a reiniciar
                 void botao.offsetWidth;
 
                 botao.classList.add("saber-click");
@@ -41,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         // --------------------------------------------------------
-        // CAMPOS DE FORMULÁRIO
+        // CAMPOS
         // --------------------------------------------------------
 
         const campos = document.querySelectorAll(
@@ -104,14 +103,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // ============================================================
-    // PRIMEIRA EXECUÇÃO
+    // EXECUÇÃO INICIAL
     // ============================================================
 
     adicionarInteracoes();
 
 
     // ============================================================
-    // STREAMLIT ATUALIZA O DOM CONSTANTEMENTE
+    // OBSERVA ALTERAÇÕES DO STREAMLIT
     // ============================================================
 
     const observer = new MutationObserver(() => {
@@ -123,4 +122,4 @@ document.addEventListener("DOMContentLoaded", () => {
         subtree: true
     });
 
-});
+})();

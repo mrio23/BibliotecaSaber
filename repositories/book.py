@@ -204,35 +204,43 @@ def excluir_livro(livro_id):
 
             raise
 
-def atualizar_livro (
+def atualizar_livro(
     livro_id,
     titulo,
     autor,
-    categoria,
+    ano_publicacao,
     quantidade,
-    ano_publicacao
+    categoria
 ):
     query = text("""
-                 UPDATE public.livros
-                 SET
-                    titulo = :titulo,
-                    autor = :autor,
-                    categoria = :categoria,
-                    quantidade = :quantidade,
-                    ano_publicacao = :ano_publicacao
-                 WHERE id = :livro_id
-                 """)
+        UPDATE public.livros
+        SET
+            titulo = :titulo,
+            autor = :autor,
+            categoria = :categoria,
+            quantidade = :quantidade,
+            ano_publicacao = :ano_publicacao
+        WHERE id = :livro_id
+    """)
+
     with get_connection() as conn:
-        resultado = conn.execute(
-            query,
-            {
-                "livro_id": livro_id,
-                "titulo": titulo,
-                "autor": autor,
-                "categoria": categoria,
-                "quantidade": quantidade,
-                "ano_publicacao": ano_publicacao,
-            }
-        )
-        
-        return resultado.rowcount > 0
+        try:
+            resultado = conn.execute(
+                query,
+                {
+                    "livro_id": livro_id,
+                    "titulo": titulo,
+                    "autor": autor,
+                    "categoria": categoria,
+                    "quantidade": quantidade,
+                    "ano_publicacao": ano_publicacao,
+                }
+            )
+
+            conn.commit()
+
+            return resultado.rowcount > 0
+
+        except Exception:
+            conn.rollback()
+            raise
