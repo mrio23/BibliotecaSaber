@@ -6,6 +6,7 @@ from main import (
     listar_livros,
     livro_possui_emprestimos,
     excluir_livro,
+    atualizar_livro,
     cadastrar_aluno,
     listar_alunos,
     aluno_possui_emprestimos,
@@ -30,7 +31,6 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="auto",
 )
-
 
 # ============================================================
 # CARREGAMENTO DO CSS
@@ -365,7 +365,7 @@ elif opcao == "Livros":
                 disponibilidade = "Disponível" if disponivel else "Indisponível"
                 status_classe = "available" if disponivel else "unavailable"
 
-                col_card, col_action = st.columns([6, 1])
+                col_card, col_action = st.columns([6, 2])
                 with col_card:
                     st.markdown(
                         f"""
@@ -386,9 +386,26 @@ elif opcao == "Livros":
                         """,
                         unsafe_allow_html=True,
                     )
+                    
                 with col_action:
-                    st.markdown('<div class="action-spacer"></div>', unsafe_allow_html=True)
-                    if st.button("🗑️ Excluir", key=f"excluir_livro_{livro_id}", use_container_width=True):
+                    st.markdown(
+                        '<div class="action-spacer"></div>',
+                        unsafe_allow_html=True,
+                    )
+
+                    if st.button(
+                        "📝 Editar",
+                        key=f"editar_livro_{livro_id}",
+                        use_container_width=True,
+                    ):
+                        st.session_state["livro_em_edicao"] = livro_id
+                        st.rerun()
+
+                    if st.button(
+                        "🗑️ Excluir",
+                        key=f"excluir_livro_{livro_id}",
+                        use_container_width=True,
+                    ):
                         try:
                             if livro_possui_emprestimos(livro_id):
                                 st.warning(
@@ -397,17 +414,152 @@ elif opcao == "Livros":
                                 )
                             else:
                                 excluir_livro(livro_id)
-                                st.success(f"Livro **{titulo}** excluído com sucesso!")
+                                st.success(
+                                    f"Livro **{titulo}** excluído com sucesso!"
+                                )
                                 st.rerun()
+
                         except ValueError as erro:
                             st.warning(str(erro))
-                        except Exception:
-                            st.error("Não foi possível excluir o livro no momento. Tente novamente mais tarde.")
-        else:
-            mensagem_vazia("📚", "Nenhum livro cadastrado", "Cadastre um livro para começar a formar o acervo.")
-    except Exception:
-        st.error("Não foi possível consultar os livros no momento. Tente novamente mais tarde.")
 
+                        except Exception:
+                            st.error(
+                                "Não foi possível excluir o livro no momento. "
+                                "Tente novamente mais tarde."
+                            )
+
+            if "livro_em_edicao" in st.session_state:
+                livro_id_edicao = st.session_state["livro_em_edicao"]
+
+                livro_selecionado = next(
+                    (
+                        livro
+                        for livro in livros
+                        if livro[0] == livro_id_edicao
+                    ),
+                    None,
+                )
+
+                if livro_selecionado:
+                    (
+                        livro_id,
+                        titulo_atual,
+                        autor_atual,
+                        ano_atual,
+                        quantidade_atual,
+                        categoria_atual,
+                    ) = livro_selecionado
+
+                    st.markdown(
+                        '<div class="section-gap"></div>',
+                        unsafe_allow_html=True,
+                    )
+
+                    secao(
+                        "Editar livro",
+                        "Atualize as informações do livro selecionado.",
+                        "📝",
+                    )
+
+                    with st.form(
+                        key=f"form_editar_livro_{livro_id}"
+                    ):
+                        novo_titulo = st.text_input(
+                            "Título do livro",
+                            value=titulo_atual,
+                        )
+
+                        novo_autor = st.text_input(
+                            "Autor",
+                            value=autor_atual,
+                        )
+
+                        col1, col2, col3 = st.columns(3)
+
+                        with col1:
+                            novo_ano = st.number_input(
+                                "Ano de publicação",
+                                min_value=0,
+                                value=int(ano_atual or 0),
+                                step=1,
+                            )
+
+                        with col2:
+                            nova_quantidade = st.number_input(
+                                "Quantidade",
+                                min_value=0,
+                                value=int(quantidade_atual or 0),
+                                step=1,
+                            )
+
+                        with col3:
+                            nova_categoria = st.text_input(
+                                "Categoria",
+                                value=categoria_atual or "",
+                            )
+
+                        col_salvar, col_cancelar = st.columns(2)
+
+                        with col_salvar:
+                            salvar = st.form_submit_button(
+                                "💾 Salvar alterações",
+                                use_container_width=True,
+                            )
+
+                        with col_cancelar:
+                            cancelar = st.form_submit_button(
+                                "❌ Cancelar",
+                                use_container_width=True,
+                            )
+
+                    if cancelar:
+                        del st.session_state["livro_em_edicao"]
+                        st.rerun()
+
+                    if salvar:
+                        if not novo_titulo.strip() or not novo_autor.strip():
+                            st.warning(
+                                "Preencha o título e o autor."
+                            )
+                        else:
+                            try:
+                                atualizar_livro(
+                                    livro_id,
+                                    novo_titulo.strip(),
+                                    novo_autor.strip(),
+                                    novo_ano,
+                                    nova_quantidade,
+                                    nova_categoria.strip(),
+                                )
+
+                                st.success(
+                                    f"Livro **{novo_titulo}** atualizado com sucesso!"
+                                )
+
+                                del st.session_state["livro_em_edicao"]
+                                st.rerun()
+
+                            except ValueError as erro:
+                                st.warning(str(erro))
+
+                            except Exception:
+                                st.error(
+                                    "Não foi possível atualizar o livro no momento. "
+                                    "Tente novamente mais tarde."
+                                )
+
+        else:
+            mensagem_vazia(
+                "📚",
+                "Nenhum livro cadastrado",
+                "Cadastre um livro para começar a formar o acervo.",
+            )
+
+    except Exception:
+        st.error(
+            "Não foi possível consultar os livros no momento. "
+            "Tente novamente mais tarde."
+        )
 
 # ============================================================
 # CADASTRAR LIVRO

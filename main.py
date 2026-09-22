@@ -12,6 +12,7 @@ from repositories.book import (
     listar_livros,
     livro_possui_emprestimos,
     excluir_livro,
+    atualizar_livro,
 )
 
 
