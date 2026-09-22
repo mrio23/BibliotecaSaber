@@ -1056,19 +1056,60 @@ section[data-testid="stSidebar"] .stButton > button:hover {
     }
 }
 
-/* TESTE DEFINITIVO DE BORDA */
+/* ============================================================
+   JAVASCRIPT — MICROINTERAÇÕES
+   ============================================================ */
+
+.stButton > button,
+[data-testid="stTextInput"] input,
+[data-testid="stNumberInput"] input,
+[data-testid="stDateInput"] input {
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        border-color .18s ease,
+        background-color .18s ease;
+}
+
+
+/* ------------------------------------------------------------
+   CLIQUE DOS BOTÕES
+   ------------------------------------------------------------ */
+
+.stButton > button.saber-click {
+    transform: scale(.97);
+}
+
+
+/* ------------------------------------------------------------
+   CAMPOS ATIVOS
+   ------------------------------------------------------------ */
+
+[data-testid="stTextInput"] input.saber-focus,
+[data-testid="stNumberInput"] input.saber-focus,
+[data-testid="stDateInput"] input.saber-focus {
+    border-color: var(--saber-blue) !important;
+
+    box-shadow:
+        0 0 0 3px rgba(23, 74, 126, .10) !important;
+}
+
+
+/* ------------------------------------------------------------
+   CARDS
+   ------------------------------------------------------------ */
 
 .metric-card,
 .entity-card,
 .book-card,
 .loan-card,
-.audit-card {
-    border: 1px solid var(--st-border-color) !important;
-    outline: none !important;
+.audit-card,
+.quick-card {
+    transition:
+        transform .20s ease,
+        box-shadow .20s ease;
 }
 
-.book-details > div,
-.loan-info-grid > div,
-.audit-data {
-    border: 1px solid var(--st-border-color-light) !important;
+.saber-card-hover {
+    transform: translateY(-2px);
 }

@@ -3,6 +3,9 @@ import json
 from database.connection import get_connection
 from sqlalchemy import text
 
+
+
+
 # ============================================================
 # LIVROS
 # ============================================================
