@@ -1,6 +1,7 @@
 import streamlit as st
 from datetime import date
 
+from auth import autenticar_usuario, paginas_permitidas
 from main import (
     cadastrar_livro,
     listar_livros,
@@ -19,67 +20,6 @@ from main import (
     contar_emprestimos_ativos,
     contar_emprestimos_atrasados,
 )
-
-# ============================================================
-# TEMA DA INTERFACE
-# ============================================================
-
-tema = st.context.theme.type
-
-if tema == "dark":
-    css_tema = """
-    <style>
-    :root {
-        --saber-surface: #0F1117;
-        --saber-surface-secondary: #151922;
-
-        --saber-detail-bg: #1B2029;
-        --saber-detail-border: #2A313D;
-
-        --saber-text: #F1F5F9;
-        --saber-muted: #AAB4C2;
-
-        --saber-border: #2B3440;
-
-        --saber-neutral-bg: #252D37;
-        --saber-neutral-text: #AAB4C2;
-
-        --saber-hover: #202631;
-    }
-    </style>
-    """
-else:
-    css_tema = """
-    <style>
-    :root {
-        --saber-surface: #FFFFFF;
-        --saber-surface-secondary: #F8FAFC;
-
-        --saber-detail-bg: #F8FAFC;
-        --saber-detail-border: #EEF2F7;
-
-        --saber-text: #1E293B;
-        --saber-muted: #64748B;
-
-        --saber-border: #E2E8F0;
-
-        --saber-neutral-bg: #F1F5F9;
-        --saber-neutral-text: #64748B;
-
-        --saber-hover: #F1F5F9;
-    }
-    </style>
-    """
-    
-# ============================================================
-# CARREGAMENTO DO CSS
-# ============================================================
-
-with open("style.css", "r", encoding="utf-8") as f:
-    css = f.read()
-
-st.markdown(css_tema, unsafe_allow_html=True)
-st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
 
 # ============================================================
 # CONFIGURAÇÃO
@@ -177,11 +117,74 @@ def badge_status(status, data_devolucao=None):
 
 
 # ============================================================
+# AUTENTICAÇÃO
+# ============================================================
+
+if "autenticado" not in st.session_state:
+    st.session_state["autenticado"] = False
+
+if not st.session_state["autenticado"]:
+    st.markdown(
+        """
+        <div class="login-heading">
+            <div class="login-icon">📚</div>
+            <h1>BIBLIOTECA <span>SABER</span></h1>
+            <p>Sistema de Gestão da Biblioteca Escolar</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    _, coluna_login, _ = st.columns([1, 1.2, 1])
+
+    with coluna_login:
+        with st.form("formulario_login"):
+            email = st.text_input(
+                "E-mail",
+                placeholder="Digite seu e-mail",
+            )
+
+            senha = st.text_input(
+                "Senha",
+                type="password",
+                placeholder="Digite sua senha",
+            )
+
+            entrar = st.form_submit_button(
+                "Entrar",
+                use_container_width=True,
+            )
+
+        if entrar:
+            usuario = autenticar_usuario(email, senha)
+
+            if usuario:
+                st.session_state["autenticado"] = True
+                st.session_state["email_usuario"] = usuario["email"]
+                st.session_state["perfil_usuario"] = usuario["perfil"]
+                st.session_state["pagina"] = "Início"
+                st.rerun()
+            else:
+                st.error("E-mail ou senha inválidos.")
+
+    st.stop()
+        
+# ============================================================
 # SIDEBAR
 # ============================================================
 
+
 if "pagina" not in st.session_state:
     st.session_state.pagina = "Início"
+
+perfil_atual = st.session_state["perfil_usuario"]
+paginas_usuario = paginas_permitidas(perfil_atual)
+
+# Impede que uma página não autorizada seja aberta
+# mesmo que seu nome esteja salvo na sessão.
+if st.session_state.pagina not in paginas_usuario:
+    st.session_state.pagina = "Início"
+
 
 st.sidebar.markdown(
     """
@@ -205,9 +208,47 @@ opcoes_menu = {
     "Auditoria": "📋  Auditoria",
 }
 
+opcoes_menu = {
+        pagina: nome
+        for pagina, nome in opcoes_menu.items()
+        if pagina in paginas_usuario
+}
+
+
 for chave, nome_exibicao in opcoes_menu.items():
     classe = "menu-active" if st.session_state.pagina == chave else ""
 
+    if st.sidebar.button(
+        nome_exibicao,
+        key=f"menu_{chave}",
+        use_container_width=True,
+    ):
+        st.session_state.pagina = chave
+        st.rerun()
+
+# Botão de sair: fora do for
+st.sidebar.markdown("---")
+st.sidebar.caption(
+    f"Conta: {st.session_state['email_usuario']}"
+)
+
+if st.sidebar.button(
+    "🚪➡️ Sair da conta",
+    use_container_width=True,
+    key="botao_sair",
+):
+    for chave in (
+        "autenticado",
+        "email_usuario",
+        "perfil_usuario",
+        "pagina",
+        "livro_em_edicao",
+    ):
+        st.session_state.pop(chave, None)
+
+    st.rerun()
+
+    
     st.sidebar.markdown(
         f'<div class="menu-state {classe}"></div>',
         unsafe_allow_html=True,
