@@ -209,6 +209,15 @@ if not st.session_state["autenticado"]:
                 key="senha_login",
             )
 
+            lembrar_computador = st.checkbox(
+                "Lembrar deste computador por 30 dias",
+                value=False,
+                help=(
+                    "Mantenha esta opção marcada apenas em um computador "
+                    "pessoal e protegido. Desmarque-a em dispositivos compartilhados."
+                ),
+            )
+
             entrar = st.form_submit_button(
                 "Entrar",
                 use_container_width=True,
@@ -235,14 +244,24 @@ if not st.session_state["autenticado"]:
                             "Tente novamente em instantes."
                         )
                     else:
-                        cookie_controller.set(
-                            "saber_sessao",
-                            token_sessao,
-                            max_age=30 * 24 * 60 * 60,
-                            path="/",
-                            secure=True,
-                            same_site="lax",
-                        )
+                        if lembrar_computador:
+                            cookie_controller.set(
+                                "saber_sessao",
+                                token_sessao,
+                                max_age=30 * 24 * 60 * 60,
+                                path="/",
+                                secure=True,
+                                same_site="lax",
+                            )
+                        else:
+                            # Cookie de sessão: o navegador deve removê-lo ao fechar.
+                            cookie_controller.set(
+                                "saber_sessao",
+                                token_sessao,
+                                path="/",
+                                secure=True,
+                                same_site="lax",
+                            )
                         st.session_state["autenticado"] = True
                         st.session_state["email_usuario"] = usuario["email"]
                         st.session_state["identificador_usuario"] = usuario["identificador"]
