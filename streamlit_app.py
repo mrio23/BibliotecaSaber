@@ -1,7 +1,13 @@
 import streamlit as st
 from datetime import date
 
-from auth import autenticar_usuario, paginas_permitidas
+from auth import (
+    autenticar_usuario,
+    cadastrar_usuario,
+    paginas_permitidas,
+    listar_usuarios_pendentes,
+    aprovar_usuario,
+)
 from main import (
     cadastrar_livro,
     listar_livros,
@@ -117,37 +123,40 @@ def badge_status(status, data_devolucao=None):
 
 
 # ============================================================
-# AUTENTICAÇÃO
+# AUTENTICAÇÃO E CADASTRO
 # ============================================================
 
 if "autenticado" not in st.session_state:
     st.session_state["autenticado"] = False
 
 if not st.session_state["autenticado"]:
-    st.markdown(
-        """
-        <div class="login-heading">
-            <div class="login-icon">📚</div>
-            <h1>BIBLIOTECA <span>SABER</span></h1>
-            <p>Sistema de Gestão da Biblioteca Escolar</p>
-        </div>
-        """,
-        unsafe_allow_html=True,
+
+    st.markdown("## 📚 Biblioteca Saber")
+    st.markdown("Sistema de Gestão da Biblioteca Escolar")
+
+    aba_entrar, aba_cadastrar = st.tabs(
+        ["Entrar", "Criar minha conta"]
     )
 
-    _, coluna_login, _ = st.columns([1, 1.2, 1])
+    # ========================================================
+    # LOGIN
+    # ========================================================
 
-    with coluna_login:
-        with st.form("formulario_login"):
-            email = st.text_input(
+    with aba_entrar:
+
+        st.subheader("Acesse sua conta")
+
+        with st.form("form_login"):
+
+            email_login = st.text_input(
                 "E-mail",
-                placeholder="Digite seu e-mail",
+                key="email_login",
             )
 
-            senha = st.text_input(
+            senha_login = st.text_input(
                 "Senha",
                 type="password",
-                placeholder="Digite sua senha",
+                key="senha_login",
             )
 
             entrar = st.form_submit_button(
@@ -156,18 +165,104 @@ if not st.session_state["autenticado"]:
             )
 
         if entrar:
-            usuario = autenticar_usuario(email, senha)
 
-            if usuario:
-                st.session_state["autenticado"] = True
-                st.session_state["email_usuario"] = usuario["email"]
-                st.session_state["perfil_usuario"] = usuario["perfil"]
-                st.session_state["pagina"] = "Início"
-                st.rerun()
+            if not email_login.strip() or not senha_login:
+                st.warning("Preencha o e-mail e a senha.")
+
             else:
-                st.error("E-mail ou senha inválidos.")
+                usuario = autenticar_usuario(
+                    email_login,
+                    senha_login,
+                )
+
+                if usuario:
+
+                    st.session_state["autenticado"] = True
+                    st.session_state["email_usuario"] = usuario["email"]
+                    st.session_state["perfil_usuario"] = usuario["perfil"]
+                    st.session_state["pagina"] = "Início"
+
+                    st.rerun()
+
+                else:
+                    st.error(
+                        "E-mail ou senha inválidos, ou conta ainda "
+                        "não aprovada pela coordenação."
+                    )
+
+    # ========================================================
+    # CADASTRO
+    # ========================================================
+
+    with aba_cadastrar:
+
+        st.subheader("Crie sua conta")
+
+        st.info(
+            "Após o cadastro, sua solicitação será analisada "
+            "pela coordenação antes da liberação do acesso."
+        )
+
+        with st.form("form_cadastro"):
+
+            nome = st.text_input(
+                "Nome completo",
+                key="cadastro_nome",
+            )
+
+            email = st.text_input(
+                "E-mail",
+                key="cadastro_email",
+            )
+
+            senha = st.text_input(
+                "Crie uma senha",
+                type="password",
+                key="cadastro_senha",
+                help="Utilize pelo menos 8 caracteres.",
+            )
+
+            confirmar_senha = st.text_input(
+                "Confirme sua senha",
+                type="password",
+                key="cadastro_confirmar_senha",
+            )
+
+            cadastrar = st.form_submit_button(
+                "Solicitar cadastro",
+                use_container_width=True,
+            )
+
+        if cadastrar:
+
+            if not nome.strip() or not email.strip() or not senha:
+                st.warning("Preencha todos os campos.")
+
+            elif senha != confirmar_senha:
+                st.error("As senhas não coincidem.")
+
+            else:
+                sucesso, mensagem = cadastrar_usuario(
+                    nome,
+                    email,
+                    senha,
+                )
+
+                if sucesso:
+                    st.success(mensagem)
+                else:
+                    st.error(mensagem)
 
     st.stop()
+
+
+# ============================================================
+# USUÁRIO AUTENTICADO
+# ============================================================
+
+perfil_atual = st.session_state["perfil_usuario"]
+
+paginas_usuario = paginas_permitidas(perfil_atual)
         
 # ============================================================
 # SIDEBAR
@@ -179,6 +274,8 @@ if "pagina" not in st.session_state:
 
 perfil_atual = st.session_state["perfil_usuario"]
 paginas_usuario = paginas_permitidas(perfil_atual)
+
+
 
 # Impede que uma página não autorizada seja aberta
 # mesmo que seu nome esteja salvo na sessão.
@@ -206,6 +303,7 @@ opcoes_menu = {
     "Cadastrar livro": "＋  Cadastrar livro",
     "Empréstimos": "📖  Empréstimos",
     "Auditoria": "📋  Auditoria",
+    "Gerenciar usuários": "🔐  Gerenciar usuários",
 }
 
 opcoes_menu = {
@@ -307,15 +405,37 @@ if opcao == "Início":
 
     st.markdown('<div class="dashboard-grid">', unsafe_allow_html=True)
 
-    indicadores = [
-        ("📚", "Livros", quantidade_livros, "Total cadastrados", "blue"),
-        ("👥", "Alunos", quantidade_alunos, "Total cadastrados", "navy"),
-        ("📖", "Empréstimos ativos", emprestimos_ativos, "Atualmente emprestados", "blue"),
-        ("⚠", "Atrasados", emprestimos_atrasados, "Precisam de atenção", "red"),
-    ]
 
-    cols = st.columns(4)
-    for coluna, (icone, titulo, valor, descricao, classe) in zip(cols, indicadores):
+    # ========================================================
+    # INDICADORES DO PAINEL
+    # ========================================================
+
+    if perfil_atual == "professor":
+        # O professor visualiza somente a quantidade de livros.
+        indicadores = [
+            (
+                "📚",
+                "Livros",
+                quantidade_livros,
+                "Total cadastrados",
+                "blue",
+            ),
+        ]
+
+    else:
+        # Bibliotecário e coordenação visualizam todos os indicadores.
+        indicadores = [
+            ("📚", "Livros", quantidade_livros, "Total cadastrados", "blue"),
+            ("👥", "Alunos", quantidade_alunos, "Total cadastrados", "navy"),
+            ("📖", "Empréstimos ativos", emprestimos_ativos, "Atualmente emprestados", "blue"),
+            ("⚠", "Atrasados", emprestimos_atrasados, "Precisam de atenção", "red"),
+        ]
+
+    cols = st.columns(len(indicadores))
+
+    for coluna, (icone, titulo, valor, descricao, classe) in zip(
+        cols, indicadores
+    ):
         with coluna:
             st.markdown(
                 f"""
@@ -332,20 +452,55 @@ if opcao == "Início":
                 unsafe_allow_html=True,
             )
 
-    st.markdown('</div>', unsafe_allow_html=True)
-
     st.markdown('<div class="home-spacer"></div>', unsafe_allow_html=True)
 
-    secao("Acesso rápido", "Encontre rapidamente uma área do sistema.", "⚡")
 
-    atalhos = [
-        ("📚", "Consultar acervo", "Visualize os livros cadastrados.", "Livros"),
-        ("👥", "Alunos", "Consulte os usuários da biblioteca.", "Alunos"),
-        ("📖", "Empréstimos", "Registre e acompanhe empréstimos.", "Empréstimos"),
-    ]
+    # ========================================================
+    # ACESSO RÁPIDO
+    # ========================================================
 
-    cols = st.columns(3)
-    for coluna, (icone, titulo, descricao, destino) in zip(cols, atalhos):
+    secao(
+        "Acesso rápido",
+        "Encontre rapidamente uma área do sistema.",
+        "⚡",
+    )
+
+    if perfil_atual == "professor":
+        atalhos = [
+            (
+                "📚",
+                "Consultar acervo",
+                "Visualize os livros cadastrados.",
+                "Livros",
+            ),
+        ]
+    else:
+        atalhos = [
+            (
+                "📚",
+                "Consultar acervo",
+                "Visualize os livros cadastrados.",
+                "Livros",
+            ),
+            (
+                "👥",
+                "Alunos",
+                "Consulte os usuários da biblioteca.",
+                "Alunos",
+            ),
+            (
+                "📖",
+                "Empréstimos",
+                "Registre e acompanhe empréstimos.",
+                "Empréstimos",
+            ),
+        ]
+
+    cols = st.columns(len(atalhos))
+
+    for indice, (coluna, (icone, titulo, descricao, destino)) in enumerate(
+        zip(cols, atalhos)
+    ):
         with coluna:
             st.markdown(
                 f"""
@@ -359,9 +514,10 @@ if opcao == "Início":
                 """,
                 unsafe_allow_html=True,
             )
+
             if st.button(
                 f"Acessar {titulo.lower()}",
-                key=f"atalho_{destino}",
+                key=f"atalho_{destino}_{indice}",
                 use_container_width=True,
             ):
                 st.session_state.pagina = destino
@@ -494,23 +650,47 @@ elif opcao == "Livros":
                         """,
                         unsafe_allow_html=True,
                     )
-                with col_action:
-                    st.markdown('<div class="action-spacer"></div>', unsafe_allow_html=True)
-                    if st.button("🗑️ Excluir", key=f"excluir_livro_{livro_id}", use_container_width=True):
-                        try:
-                            if livro_possui_emprestimos(livro_id):
-                                st.warning(
-                                    f"⚠️ Não é possível excluir o livro **{titulo}**, "
-                                    "pois ele possui registros de empréstimos."
+
+                # Somente bibliotecário e coordenação podem excluir livros.
+                if perfil_atual != "professor":
+
+                    with col_action:
+                        st.markdown(
+                            '<div class="action-spacer"></div>',
+                            unsafe_allow_html=True,
+                        )
+
+                        if st.button(
+                            "🗑️ Excluir",
+                            key=f"excluir_livro_{livro_id}",
+                            use_container_width=True,
+                        ):
+                            try:
+                                if livro_possui_emprestimos(livro_id):
+                                    st.warning(
+                                        f"⚠️ Não é possível excluir o livro "
+                                        f"**{titulo}**, pois ele possui "
+                                        "registros de empréstimos."
+                                    )
+                                else:
+                                    excluir_livro(livro_id)
+
+                                    st.success(
+                                        f"Livro **{titulo}** excluído "
+                                        "com sucesso!"
+                                    )
+
+                                    st.rerun()
+
+                            except ValueError as erro:
+                                st.warning(str(erro))
+
+                            except Exception:
+                                st.error(
+                                    "Não foi possível excluir o livro "
+                                    "no momento. Tente novamente mais tarde."
                                 )
-                            else:
-                                excluir_livro(livro_id)
-                                st.success(f"Livro **{titulo}** excluído com sucesso!")
-                                st.rerun()
-                        except ValueError as erro:
-                            st.warning(str(erro))
-                        except Exception:
-                            st.error("Não foi possível excluir o livro no momento. Tente novamente mais tarde.")
+
         else:
             mensagem_vazia("📚", "Nenhum livro cadastrado", "Cadastre um livro para começar a formar o acervo.")
     except Exception:
@@ -723,6 +903,111 @@ elif opcao == "Auditoria":
     except Exception as erro:
         st.error(f"Não foi possível carregar os registros de auditoria: {erro}")
 
+# ============================================================
+# GERENCIAR USUÁRIOS
+# ============================================================
+
+elif opcao == "Gerenciar usuários":
+    
+    if st.session_state.get("perfil_usuario") != "coordenacao":
+        st.error("Você não tem permissão para acessar esta página.")
+        st.stop()
+        
+    cabecalho_pagina(
+        "Gerenciar usuários",
+        "Analise os cadastros e aprove o acesso de professores e bibliotecários."
+        "🔐",
+    )
+    
+    secao(
+        "Solicitações de cadastro",
+        "Consulte as contas que aguardam aprovação da coordenação.",
+        "👥",
+    )
+    
+    usuarios_pendentes = listar_usuarios_pendentes()
+    
+    if usuarios_pendentes is None:
+        
+        st.error(
+            "Não foi possível consultar os cadastros pendentes. "
+            "Tente novamente mais tarde."
+        )
+        
+    elif not usuarios_pendentes:
+        
+        mensagem_vazia(
+            "✅",
+            "Nenhum cadastro pendente",
+            "Quando alguém criar uma conta, a solicitação aparecerá aqui."
+        )
+        
+    else:
+        
+        st.info(
+            f"Existem {len(usuarios_pendentes)} "
+            "cadastro(s) aguardando aprovação."
+        )
+        
+        for usuario in usuarios_pendentes:
+            
+            usuario_id = usuario["id"]
+            
+            with st.container(border=True):
+                
+                st.markdown(f"### 👤 {usuario['nome']}")
+                
+                st.write(f"**E-mail:** {usuario['email']}")
+                
+                data_cadastro = usuario.get("criado_em")
+                
+                if data_cadastro:
+                    st.write(
+                        f"**Data do cadastro:** {data_cadastro}"
+                    )
+                    
+                    st.divider()
+                    
+                    col_perfil, col_botao = st.columns(
+                        [2, 1],
+                        vertical_alignment="bottom",
+                    )
+                    with col_perfil:
+                        
+                        perfil_escolhido = st.selectbox(
+                            "Perfil a conceder",
+                            options = [
+                                "bibliotecaria",
+                                "professor",
+                            ],
+                            format_func=lambda perfil: {
+                                "bibliotecaria": "Bibliotecário(a)",
+                                "professor": "Professor(a)",
+                            }[perfil],
+                            key=f"perfil_usuario_{usuario_id}",
+                        )
+                        
+                    with col_botao:
+                        
+                        if st.button(
+                            "✅ Aprovar cadastro",
+                            key=f"aprovar_usuario_{usuario_id}",
+                            use_container_width=True,
+                        ):
+                            
+                            sucesso, mensagem = aprovar_usuario(
+                                usuario_id,
+                                perfil_escolhido,
+                            )
+                            
+                            if sucesso:
+                                
+                                st.success(mensagem)
+                                st.rerun()
+                                
+                            else:
+                                
+                                st.error(mensagem)
 
 # ============================================================
 # RODAPÉ
