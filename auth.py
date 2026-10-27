@@ -218,15 +218,15 @@ def paginas_permitidas(perfil):
             "Início",
             "Livros",
         ],
-        
+
         "bibliotecaria": [
             "Início",
             "Alunos",
             "Livros",
-            "Cadastrar Livro",
+            "Cadastrar livro",
             "Empréstimos",
         ],
-        
+
         "coordenacao": [
             "Início",
             "Alunos",
@@ -237,7 +237,7 @@ def paginas_permitidas(perfil):
             "Gerenciar usuários",
         ],
     }
-    
+
     return permissoes.get(perfil, [])
 
 if __name__ == "__main__":
