@@ -8,6 +8,7 @@ from auth import (
     criar_sessao_persistente,
     validar_sessao_persistente,
     encerrar_sessao_persistente,
+    garantir_coordenadora_inicial,
     paginas_permitidas,
     listar_usuarios_pendentes,
     aprovar_usuario,
@@ -59,6 +60,10 @@ def carregar_css():
 
 
 carregar_css()
+
+# Cria a conta administrativa uma única vez, usando os Secrets do ambiente.
+# Se a conta já existir, e-mail e senha nunca são sobrescritos.
+garantir_coordenadora_inicial()
 
 # Cookie persistente no navegador. O valor é um token aleatório, nunca a senha.
 cookie_controller = CookieController(key="biblioteca_saber_cookies")
