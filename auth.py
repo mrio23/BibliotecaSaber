@@ -529,3 +529,45 @@ def encerrar_sessao_persistente(token):
     except Exception:
         pass
 
+def garantir_coordenadora_inicial():
+    """
+    Cria a conta inicial da coordenação apenas se ainda não existir nenhuma.
+    As credenciais iniciais devem ser configuradas em st.secrets/ambiente.
+    Nunca substitui e-mail ou senha de uma conta de coordenação já existente.
+    """
+    try:
+        nome = str(st.secrets.get("COORDENADORA_NOME", "Coordenação Biblioteca Saber")).strip()
+        email = str(st.secrets["COORDENADORA_EMAIL"]).strip().lower()
+        senha = str(st.secrets["COORDENADORA_SENHA"])
+
+        if not email or not senha or len(senha) < 8:
+            return False, "As credenciais iniciais da coordenação não estão configuradas corretamente."
+
+        with engine.begin() as conn:
+            existe = conn.execute(text("""
+                SELECT id
+                FROM usuarios
+                WHERE perfil = 'coordenacao'
+                LIMIT 1
+            """)).first()
+
+            if existe:
+                return True, "A conta da coordenação já existe."
+
+            senha_hash = gerar_hash_senha(senha)
+            conn.execute(text("""
+                INSERT INTO usuarios (nome, email, senha_hash, perfil, ativo)
+                VALUES (:nome, :email, :senha_hash, 'coordenacao', TRUE)
+            """), {
+                "nome": nome,
+                "email": email,
+                "senha_hash": senha_hash,
+            })
+
+        return True, "Conta inicial da coordenação criada."
+    except Exception:
+        return False, (
+            "Não foi possível verificar a conta inicial da coordenação. "
+            "Confira as configurações e a conexão com o banco de dados."
+        )
+
