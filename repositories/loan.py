@@ -22,7 +22,7 @@ def registrar_emprestimo(
                     SELECT
                         id,
                         titulo,
-                        categoria
+                        quantidade
                     FROM livros
                     WHERE LOWER(titulo) = LOWER(:titulo)
                 """),

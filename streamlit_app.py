@@ -210,7 +210,7 @@ if not st.session_state["autenticado"]:
             )
 
             lembrar_computador = st.checkbox(
-                "Lembrar deste computador por 30 dias",
+                "Lembrar deste dispositivo por 30 dias.",
                 value=False,
                 help=(
                     "Mantenha esta opção marcada apenas em um computador "
