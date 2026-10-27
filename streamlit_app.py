@@ -1,9 +1,13 @@
 import streamlit as st
+from streamlit_cookies_controller import CookieController
 from datetime import date
 
 from auth import (
     autenticar_usuario,
     cadastrar_usuario,
+    criar_sessao_persistente,
+    validar_sessao_persistente,
+    encerrar_sessao_persistente,
     paginas_permitidas,
     listar_usuarios_pendentes,
     aprovar_usuario,
@@ -55,6 +59,12 @@ def carregar_css():
 
 
 carregar_css()
+
+# Cookie persistente no navegador. O valor é um token aleatório, nunca a senha.
+cookie_controller = CookieController(key="biblioteca_saber_cookies")
+cookies_navegador = cookie_controller.getAll()
+if cookies_navegador is None:
+    st.stop()
 
 
 # ============================================================
@@ -132,6 +142,38 @@ def badge_status(status, data_devolucao=None):
 if "autenticado" not in st.session_state:
     st.session_state["autenticado"] = False
 
+# Recupera a sessão após fechar/reabrir o navegador ou atualizar a página.
+if not st.session_state["autenticado"]:
+    token_salvo = cookies_navegador.get("saber_sessao")
+    if token_salvo:
+        usuario_salvo = validar_sessao_persistente(token_salvo)
+        if usuario_salvo:
+            st.session_state["autenticado"] = True
+            st.session_state["email_usuario"] = usuario_salvo["email"]
+            st.session_state["identificador_usuario"] = usuario_salvo["identificador"]
+            st.session_state["perfil_usuario"] = usuario_salvo["perfil"]
+            st.session_state["token_sessao"] = token_salvo
+            st.session_state["pagina"] = "Início"
+        else:
+            cookie_controller.remove("saber_sessao")
+
+# Revalida a conta no banco em cada execução: bloqueia contas desativadas
+# e atualiza o perfil caso a coordenação tenha alterado as permissões.
+if st.session_state["autenticado"]:
+    token_atual = st.session_state.get("token_sessao") or cookies_navegador.get("saber_sessao")
+    usuario_atualizado = validar_sessao_persistente(token_atual)
+    if not usuario_atualizado:
+        cookie_controller.remove("saber_sessao")
+        for chave in (
+            "autenticado", "email_usuario", "identificador_usuario",
+            "perfil_usuario", "token_sessao", "pagina", "livro_em_edicao",
+        ):
+            st.session_state.pop(chave, None)
+        st.rerun()
+    st.session_state["email_usuario"] = usuario_atualizado["email"]
+    st.session_state["identificador_usuario"] = usuario_atualizado["identificador"]
+    st.session_state["perfil_usuario"] = usuario_atualizado["perfil"]
+
 if not st.session_state["autenticado"]:
 
     st.markdown("## 📚 Biblioteca Saber")
@@ -180,13 +222,29 @@ if not st.session_state["autenticado"]:
 
                 if usuario:
 
-                    st.session_state["autenticado"] = True
-                    st.session_state["email_usuario"] = usuario["email"]
-                    st.session_state["identificador_usuario"] = usuario["identificador"]
-                    st.session_state["perfil_usuario"] = usuario["perfil"]
-                    st.session_state["pagina"] = "Início"
+                    token_sessao = criar_sessao_persistente(usuario["identificador"])
 
-                    st.rerun()
+                    if not token_sessao:
+                        st.error(
+                            "Não foi possível iniciar uma sessão persistente. "
+                            "Tente novamente em instantes."
+                        )
+                    else:
+                        cookie_controller.set(
+                            "saber_sessao",
+                            token_sessao,
+                            max_age=30 * 24 * 60 * 60,
+                            path="/",
+                            secure=True,
+                            same_site="lax",
+                        )
+                        st.session_state["autenticado"] = True
+                        st.session_state["email_usuario"] = usuario["email"]
+                        st.session_state["identificador_usuario"] = usuario["identificador"]
+                        st.session_state["perfil_usuario"] = usuario["perfil"]
+                        st.session_state["token_sessao"] = token_sessao
+                        st.session_state["pagina"] = "Início"
+                        st.rerun()
 
                 else:
                     st.error(
@@ -339,11 +397,16 @@ if st.sidebar.button(
     use_container_width=True,
     key="botao_sair",
 ):
+    encerrar_sessao_persistente(
+        st.session_state.get("token_sessao") or cookies_navegador.get("saber_sessao")
+    )
+    cookie_controller.remove("saber_sessao")
     for chave in (
         "autenticado",
         "email_usuario",
         "identificador_usuario",
         "perfil_usuario",
+        "token_sessao",
         "pagina",
         "livro_em_edicao",
     ):
