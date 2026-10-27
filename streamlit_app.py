@@ -7,6 +7,9 @@ from auth import (
     paginas_permitidas,
     listar_usuarios_pendentes,
     aprovar_usuario,
+    listar_usuarios_cadastrados,
+    atualizar_perfil_usuario,
+    excluir_usuario,
 )
 from main import (
     cadastrar_livro,
@@ -179,6 +182,7 @@ if not st.session_state["autenticado"]:
 
                     st.session_state["autenticado"] = True
                     st.session_state["email_usuario"] = usuario["email"]
+                    st.session_state["identificador_usuario"] = usuario["identificador"]
                     st.session_state["perfil_usuario"] = usuario["perfil"]
                     st.session_state["pagina"] = "Início"
 
@@ -338,6 +342,7 @@ if st.sidebar.button(
     for chave in (
         "autenticado",
         "email_usuario",
+        "identificador_usuario",
         "perfil_usuario",
         "pagina",
         "livro_em_edicao",
@@ -908,108 +913,223 @@ elif opcao == "Auditoria":
 # ============================================================
 
 elif opcao == "Gerenciar usuários":
-    
+
     if st.session_state.get("perfil_usuario") != "coordenacao":
         st.error("Você não tem permissão para acessar esta página.")
         st.stop()
-        
+
     cabecalho_pagina(
         "Gerenciar usuários",
-        "Analise os cadastros e aprove o acesso de professores e bibliotecários."
+        "Aprove solicitações e administre os perfis cadastrados.",
         "🔐",
     )
-    
+
+    # --------------------------------------------------------
+    # SOLICITAÇÕES PENDENTES
+    # --------------------------------------------------------
     secao(
         "Solicitações de cadastro",
-        "Consulte as contas que aguardam aprovação da coordenação.",
-        "👥",
+        "Escolha o perfil e aprove as contas que aguardam autorização.",
+        "🕒",
     )
-    
+
     usuarios_pendentes = listar_usuarios_pendentes()
-    
+
     if usuarios_pendentes is None:
-        
         st.error(
             "Não foi possível consultar os cadastros pendentes. "
             "Tente novamente mais tarde."
         )
-        
     elif not usuarios_pendentes:
-        
         mensagem_vazia(
             "✅",
             "Nenhum cadastro pendente",
-            "Quando alguém criar uma conta, a solicitação aparecerá aqui."
+            "Quando alguém criar uma conta, a solicitação aparecerá aqui.",
         )
-        
     else:
-        
-        st.info(
-            f"Existem {len(usuarios_pendentes)} "
-            "cadastro(s) aguardando aprovação."
-        )
-        
         for usuario in usuarios_pendentes:
-            
             usuario_id = usuario["id"]
-            
+
             with st.container(border=True):
-                
                 st.markdown(f"### 👤 {usuario['nome']}")
-                
                 st.write(f"**E-mail:** {usuario['email']}")
-                
+
                 data_cadastro = usuario.get("criado_em")
-                
                 if data_cadastro:
-                    st.write(
-                        f"**Data do cadastro:** {data_cadastro}"
+                    st.caption(f"Solicitação recebida: {data_cadastro}")
+
+                col_perfil, col_botao = st.columns(
+                    [2, 1],
+                    vertical_alignment="bottom",
+                )
+
+                with col_perfil:
+                    perfil_escolhido = st.selectbox(
+                        "Perfil a conceder",
+                        options=["bibliotecaria", "professor"],
+                        format_func=lambda perfil: {
+                            "bibliotecaria": "Bibliotecário(a)",
+                            "professor": "Professor(a)",
+                        }[perfil],
+                        key=f"perfil_pendente_{usuario_id}",
                     )
-                    
-                    st.divider()
-                    
-                    col_perfil, col_botao = st.columns(
-                        [2, 1],
-                        vertical_alignment="bottom",
+
+                with col_botao:
+                    if st.button(
+                        "✅ Aprovar cadastro",
+                        key=f"aprovar_usuario_{usuario_id}",
+                        use_container_width=True,
+                    ):
+                        sucesso, mensagem = aprovar_usuario(
+                            usuario_id,
+                            perfil_escolhido,
+                        )
+                        if sucesso:
+                            st.success(mensagem)
+                            st.rerun()
+                        else:
+                            st.error(mensagem)
+
+    st.markdown('<div class="section-gap"></div>', unsafe_allow_html=True)
+
+    # --------------------------------------------------------
+    # CONTAS ATIVAS
+    # --------------------------------------------------------
+    secao(
+        "Usuários cadastrados",
+        "Altere o perfil ou remova contas existentes.",
+        "👥",
+    )
+
+    usuarios_cadastrados = listar_usuarios_cadastrados()
+    identificador_atual = st.session_state.get("identificador_usuario")
+
+    if usuarios_cadastrados is None:
+        st.error(
+            "Não foi possível carregar os usuários cadastrados. "
+            "Tente novamente mais tarde."
+        )
+    elif not usuarios_cadastrados:
+        mensagem_vazia(
+            "👥",
+            "Nenhum usuário ativo encontrado",
+            "As contas aprovadas aparecerão nesta seção.",
+        )
+    else:
+        for usuario in usuarios_cadastrados:
+            usuario_id = usuario["id"]
+            perfil_atual_usuario = str(usuario["perfil"]).strip().lower()
+            eh_propria_conta = str(usuario_id) == str(identificador_atual)
+            chave_confirmacao = f"confirmar_excluir_usuario_{usuario_id}"
+
+            with st.container(border=True):
+                col_dados, col_perfil = st.columns([2, 2])
+
+                with col_dados:
+                    st.markdown(f"### 👤 {usuario['nome']}")
+                    st.write(f"**E-mail:** {usuario['email']}")
+                    rotulos_perfil = {
+                        "coordenacao": "Coordenação",
+                        "bibliotecaria": "Bibliotecário(a)",
+                        "professor": "Professor(a)",
+                    }
+                    st.caption(
+                        "Perfil atual: "
+                        + rotulos_perfil.get(
+                            perfil_atual_usuario,
+                            perfil_atual_usuario,
+                        )
                     )
-                    with col_perfil:
-                        
+                    if eh_propria_conta:
+                        st.info("Esta é a sua conta administrativa.")
+
+                with col_perfil:
+                    if perfil_atual_usuario in {"bibliotecaria", "professor"}:
                         perfil_escolhido = st.selectbox(
-                            "Perfil a conceder",
-                            options = [
-                                "bibliotecaria",
-                                "professor",
-                            ],
+                            "Alterar perfil",
+                            options=["bibliotecaria", "professor"],
+                            index=(
+                                0
+                                if perfil_atual_usuario == "bibliotecaria"
+                                else 1
+                            ),
                             format_func=lambda perfil: {
                                 "bibliotecaria": "Bibliotecário(a)",
                                 "professor": "Professor(a)",
                             }[perfil],
-                            key=f"perfil_usuario_{usuario_id}",
+                            key=f"editar_perfil_{usuario_id}",
                         )
-                        
-                    with col_botao:
-                        
+
                         if st.button(
-                            "✅ Aprovar cadastro",
-                            key=f"aprovar_usuario_{usuario_id}",
+                            "💾 Salvar perfil",
+                            key=f"salvar_perfil_{usuario_id}",
                             use_container_width=True,
                         ):
-                            
-                            sucesso, mensagem = aprovar_usuario(
+                            sucesso, mensagem = atualizar_perfil_usuario(
                                 usuario_id,
                                 perfil_escolhido,
                             )
-                            
                             if sucesso:
-                                
                                 st.success(mensagem)
                                 st.rerun()
-                                
                             else:
-                                
+                                st.error(mensagem)
+                    else:
+                        st.caption(
+                            "O perfil da coordenação não pode ser alterado "
+                            "por esta tela."
+                        )
+
+                if eh_propria_conta:
+                    st.button(
+                        "🗑️ Excluir conta",
+                        key=f"excluir_usuario_{usuario_id}",
+                        disabled=True,
+                        help="Você não pode excluir a própria conta.",
+                        use_container_width=True,
+                    )
+                elif not st.session_state.get(chave_confirmacao, False):
+                    if st.button(
+                        "🗑️ Excluir usuário",
+                        key=f"excluir_usuario_{usuario_id}",
+                        use_container_width=True,
+                    ):
+                        st.session_state[chave_confirmacao] = True
+                        st.rerun()
+                else:
+                    st.warning(
+                        f"Confirma a exclusão da conta de {usuario['nome']}? "
+                        "Esta ação não pode ser desfeita."
+                    )
+                    col_confirmar, col_cancelar = st.columns(2)
+
+                    with col_confirmar:
+                        if st.button(
+                            "Confirmar exclusão",
+                            key=f"confirmar_exclusao_{usuario_id}",
+                            type="primary",
+                            use_container_width=True,
+                        ):
+                            sucesso, mensagem = excluir_usuario(
+                                usuario_id,
+                                identificador_atual,
+                            )
+                            st.session_state.pop(chave_confirmacao, None)
+                            if sucesso:
+                                st.success(mensagem)
+                                st.rerun()
+                            else:
                                 st.error(mensagem)
 
-# ============================================================
+                    with col_cancelar:
+                        if st.button(
+                            "Cancelar",
+                            key=f"cancelar_exclusao_{usuario_id}",
+                            use_container_width=True,
+                        ):
+                            st.session_state.pop(chave_confirmacao, None)
+                            st.rerun()
+
 # RODAPÉ
 # ============================================================
 
