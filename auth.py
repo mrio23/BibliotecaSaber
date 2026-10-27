@@ -412,3 +412,120 @@ def excluir_usuario(usuario_id, identificador_atual):
             "Verifique se há vínculos no banco de dados."
         )
 
+# ============================================================
+# SESSÕES PERSISTENTES (30 DIAS)
+# ============================================================
+
+DURACAO_SESSAO_DIAS = 30
+
+
+def _garantir_tabela_sessoes():
+    """Cria a tabela de sessões persistentes caso ainda não exista."""
+    with engine.begin() as conn:
+        conn.execute(text("""
+            CREATE TABLE IF NOT EXISTS sessoes_usuarios (
+                token_hash VARCHAR(64) PRIMARY KEY,
+                usuario_id TEXT NOT NULL,
+                criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                expira_em TIMESTAMPTZ NOT NULL,
+                ultimo_acesso_em TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            )
+        """))
+        conn.execute(text("""
+            CREATE INDEX IF NOT EXISTS idx_sessoes_usuarios_usuario
+            ON sessoes_usuarios (usuario_id)
+        """))
+
+
+def criar_sessao_persistente(usuario_id):
+    """Gera token aleatório; somente seu hash fica armazenado no banco."""
+    try:
+        _garantir_tabela_sessoes()
+        token = secrets.token_urlsafe(48)
+        token_hash = hashlib.sha256(token.encode("utf-8")).hexdigest()
+
+        with engine.begin() as conn:
+            conn.execute(text("""
+                INSERT INTO sessoes_usuarios
+                    (token_hash, usuario_id, expira_em)
+                VALUES
+                    (:token_hash, :usuario_id,
+                     NOW() + (:dias * INTERVAL '1 day'))
+            """), {
+                "token_hash": token_hash,
+                "usuario_id": str(usuario_id),
+                "dias": DURACAO_SESSAO_DIAS,
+            })
+
+        return token
+    except Exception:
+        return None
+
+
+def validar_sessao_persistente(token):
+    """Valida token, expiração e situação atual do usuário no banco."""
+    if not token or not isinstance(token, str):
+        return None
+
+    try:
+        _garantir_tabela_sessoes()
+        token_hash = hashlib.sha256(token.encode("utf-8")).hexdigest()
+
+        with engine.begin() as conn:
+            usuario = conn.execute(text("""
+                SELECT u.id, u.nome, u.email, u.perfil, u.ativo
+                FROM sessoes_usuarios s
+                JOIN usuarios u ON CAST(u.id AS TEXT) = s.usuario_id
+                WHERE s.token_hash = :token_hash
+                  AND s.expira_em > NOW()
+                  AND u.ativo = TRUE
+                LIMIT 1
+            """), {"token_hash": token_hash}).mappings().first()
+
+            if usuario is None:
+                conn.execute(text("""
+                    DELETE FROM sessoes_usuarios
+                    WHERE token_hash = :token_hash
+                """), {"token_hash": token_hash})
+                return None
+
+            perfil = str(usuario["perfil"]).strip().lower()
+            if perfil not in PAGINAS_POR_PERFIL:
+                conn.execute(text("""
+                    DELETE FROM sessoes_usuarios
+                    WHERE token_hash = :token_hash
+                """), {"token_hash": token_hash})
+                return None
+
+            conn.execute(text("""
+                UPDATE sessoes_usuarios
+                SET ultimo_acesso_em = NOW()
+                WHERE token_hash = :token_hash
+            """), {"token_hash": token_hash})
+
+            return {
+                "identificador": usuario["id"],
+                "nome": usuario["nome"],
+                "email": usuario["email"],
+                "perfil": perfil,
+            }
+    except Exception:
+        return None
+
+
+def encerrar_sessao_persistente(token):
+    """Invalida no banco uma sessão persistente ao sair da conta."""
+    if not token or not isinstance(token, str):
+        return
+
+    try:
+        _garantir_tabela_sessoes()
+        token_hash = hashlib.sha256(token.encode("utf-8")).hexdigest()
+        with engine.begin() as conn:
+            conn.execute(text("""
+                DELETE FROM sessoes_usuarios
+                WHERE token_hash = :token_hash
+            """), {"token_hash": token_hash})
+    except Exception:
+        pass
+
