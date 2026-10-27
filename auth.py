@@ -314,3 +314,101 @@ def aprovar_usuario(usuario_id, perfil):
 
     except Exception:
         return False, "Não foi possível aprovar o usuário."
+
+
+def listar_usuarios_cadastrados():
+    """Lista usuários ativos para a coordenação administrar."""
+    try:
+        with engine.begin() as conn:
+            resultado = conn.execute(
+                text("""
+                    SELECT id, nome, email, perfil, ativo, criado_em
+                    FROM usuarios
+                    WHERE ativo = TRUE
+                    ORDER BY nome ASC
+                """)
+            )
+            return [dict(usuario) for usuario in resultado.mappings()]
+    except Exception:
+        return None
+
+
+def atualizar_perfil_usuario(usuario_id, perfil):
+    """Atualiza o perfil de um usuário ativo, sem conceder coordenação."""
+    perfis_validos = {"bibliotecaria", "professor"}
+
+    if perfil not in perfis_validos:
+        return False, "O perfil selecionado não é válido."
+
+    try:
+        with engine.begin() as conn:
+            resultado = conn.execute(
+                text("""
+                    UPDATE usuarios
+                    SET perfil = :perfil
+                    WHERE id = :usuario_id
+                      AND ativo = TRUE
+                      AND perfil IN ('bibliotecaria', 'professor')
+                    RETURNING id
+                """),
+                {"usuario_id": usuario_id, "perfil": perfil},
+            )
+
+            if resultado.fetchone() is None:
+                return False, (
+                    "Usuário não encontrado ou perfil não pode ser alterado."
+                )
+
+        return True, "Perfil atualizado com sucesso!"
+    except Exception:
+        return False, "Não foi possível atualizar o perfil do usuário."
+
+
+def excluir_usuario(usuario_id, identificador_atual):
+    """Exclui uma conta, protegendo a própria conta e o último coordenador."""
+    if str(usuario_id) == str(identificador_atual):
+        return False, "Você não pode excluir a própria conta."
+
+    try:
+        with engine.begin() as conn:
+            usuario = conn.execute(
+                text("""
+                    SELECT id, perfil, ativo
+                    FROM usuarios
+                    WHERE id = :usuario_id
+                    FOR UPDATE
+                """),
+                {"usuario_id": usuario_id},
+            ).mappings().first()
+
+            if usuario is None:
+                return False, "Usuário não encontrado."
+
+            if usuario["perfil"] == "coordenacao" and usuario["ativo"]:
+                total_coordenadores = conn.execute(
+                    text("""
+                        SELECT COUNT(*)
+                        FROM usuarios
+                        WHERE perfil = 'coordenacao'
+                          AND ativo = TRUE
+                    """)
+                ).scalar_one()
+
+                if total_coordenadores <= 1:
+                    return False, (
+                        "Não é possível excluir a última conta ativa "
+                        "da coordenação."
+                    )
+
+            conn.execute(
+                text("DELETE FROM usuarios WHERE id = :usuario_id"),
+                {"usuario_id": usuario_id},
+            )
+
+        return True, "Usuário excluído com sucesso."
+    except Exception:
+        return False, (
+            "Não foi possível excluir o usuário. "
+            "Verifique se há vínculos no banco de dados."
+        )
+
