@@ -419,8 +419,13 @@ def excluir_usuario(usuario_id, identificador_atual):
 DURACAO_SESSAO_DIAS = 30
 
 
+@st.cache_resource
 def _garantir_tabela_sessoes():
-    """Cria a tabela de sessões persistentes caso ainda não exista."""
+    """Garante o esquema de sessões uma vez por processo da aplicação.
+
+    O resultado é compartilhado entre reruns e sessões do Streamlit para
+    evitar executar DDL (CREATE TABLE/INDEX) a cada interação do usuário.
+    """
     with engine.begin() as conn:
         conn.execute(text("""
             CREATE TABLE IF NOT EXISTS sessoes_usuarios (
